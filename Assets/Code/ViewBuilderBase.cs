@@ -26,13 +26,12 @@ namespace Code
             var gameObject = new GameObject();
             gameObject.transform.SetParent(_root);
 
-            TView view = CreateView(gameObject);
-
-            view.Model = model;
+            TView view = CreateView(gameObject, (TModel)model);
+            view.Initialize();
 
             return view;
         }
 
-        protected abstract TView CreateView(GameObject gameObject);
+        protected abstract TView CreateView(GameObject gameObject, TModel model);
     }
 }
