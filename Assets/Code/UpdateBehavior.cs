@@ -8,7 +8,10 @@ namespace Code
         private readonly List<IUpdatable> _updatableObjects = new();
 
         public void AddToUpdate(IUpdatable updatableObject) => _updatableObjects.Add(updatableObject);
-        
-        private void Update() => _updatableObjects.ForEach(x => x.Update());
+
+        private void FixedUpdate()
+        {
+            _updatableObjects.RemoveAll(x => !x.Update());
+        }
     }
 }

@@ -10,6 +10,7 @@ namespace Code
 
         [Header("Settings")] 
         [SerializeField] private Transform _bubbleShooterSpawner;
+        [SerializeField] private float _bubbleSpeed;
 
         [Header("Storages")] 
         [SerializeField] private BubbleViewStorage _bubbleViewStorage;
@@ -32,12 +33,14 @@ namespace Code
 
             _bubbleBuilder = new BubbleBuilder(viewModelDispatcher);
             
-            _userInput.Shot += UserInputOnShot;
-        }
+            var bubbleShooter = new BubbleShooter(
+                _bubbleShooterSpawner.position,
+                _bubbleBuilder,
+                _userInput,
+                _updateBehavior.AddToUpdate
+            );
 
-        private void UserInputOnShot(object sender, Vector2 target)
-        {
-            _bubbleBuilder.Build(BubbleType.Yellow, target);
+            bubbleShooter.BubbleSpeed = _bubbleSpeed;
         }
 
         private IViewBuilder[] GetViewBuilders()

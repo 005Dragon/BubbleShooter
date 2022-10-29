@@ -14,12 +14,14 @@ namespace Code
             _camera = camera;
         }
 
-        public void Update()
+        public bool Update()
         {
-            if (Input.GetMouseButton(0))
+            if (Input.GetMouseButtonUp(0))
             {
                 Shot?.Invoke(this, GetTargetPosition());
             }
+
+            return true;
         }
 
         public Vector2 GetTargetPosition()
