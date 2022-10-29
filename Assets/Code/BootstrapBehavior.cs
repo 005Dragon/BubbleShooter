@@ -11,43 +11,41 @@ namespace Code
         [Header("Settings")] 
         [SerializeField] private Transform _bubbleShooterSpawner;
         [SerializeField] private float _bubbleSpeed;
+        [SerializeField] private float _mapWidth;
 
         [Header("Storages")] 
         [SerializeField] private BubbleViewStorage _bubbleViewStorage;
 
-        private BubbleService _bubbleService;
-        private UserInput _userInput;
-        private UpdateBehavior _updateBehavior;
-        private BubbleBuilder _bubbleBuilder;
-
         private void Awake()
         {
-            _updateBehavior = GetComponent<UpdateBehavior>();
+            var updateBehavior = GetComponent<UpdateBehavior>();
             
-            _bubbleService = new BubbleService(_bubbleViewStorage);
+            var bubbleService = new BubbleService(_bubbleViewStorage);
 
-            ViewModelDispatcher viewModelDispatcher = new ViewModelDispatcher(GetViewBuilders());
+            ViewModelDispatcher viewModelDispatcher = new ViewModelDispatcher(GetViewBuilders(bubbleService));
             
-            _userInput = new UserInput(_mainCamera);
-            _updateBehavior.AddToUpdate(_userInput);
+            var userInput = new UserInput(_mainCamera);
+            updateBehavior.AddToUpdate(userInput);
 
-            _bubbleBuilder = new BubbleBuilder(viewModelDispatcher);
+            var map = new Map(_mainCamera);
+            map.Construct(_mapWidth);
+
+            var bubbleBuilder = new BubbleBuilder(viewModelDispatcher);
+            var bubbleMoveBuilder = new BubbleMoveBuilder(_bubbleSpeed, map, updateBehavior);
             
-            var bubbleShooter = new BubbleShooter(
+            new BubbleShooter(
                 _bubbleShooterSpawner.position,
-                _bubbleBuilder,
-                _userInput,
-                _updateBehavior.AddToUpdate
+                bubbleBuilder,
+                bubbleMoveBuilder,
+                userInput
             );
-
-            bubbleShooter.BubbleSpeed = _bubbleSpeed;
         }
 
-        private IViewBuilder[] GetViewBuilders()
+        private IViewBuilder[] GetViewBuilders(BubbleService bubbleService)
         {
             return new IViewBuilder[]
             {
-                new BubbleViewBuilder(transform, _bubbleService)
+                new BubbleViewBuilder(transform, bubbleService)
             };
         }
     }

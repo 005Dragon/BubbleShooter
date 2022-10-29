@@ -1,25 +1,22 @@
-using System;
 using UnityEngine;
 
 namespace Code
 {
     public class BubbleShooter
     {
-        public float BubbleSpeed { get; set; } = 1.0f;
-        
         private readonly Vector2 _position;
         private readonly BubbleBuilder _bubbleBuilder;
-        private readonly Action<IUpdatable> _registerUpdatableObject;
+        private readonly BubbleMoveBuilder _bubbleMoveBuilder;
 
         public BubbleShooter(
             Vector2 position, 
             BubbleBuilder bubbleBuilder, 
-            UserInput userInput,
-            Action<IUpdatable> registerUpdatableObject)
+            BubbleMoveBuilder bubbleMoveBuilder,
+            UserInput userInput)
         {
             _position = position;
             _bubbleBuilder = bubbleBuilder;
-            _registerUpdatableObject = registerUpdatableObject;
+            _bubbleMoveBuilder = bubbleMoveBuilder;
 
             userInput.Shot += UserInputOnShot;
         }
@@ -28,9 +25,9 @@ namespace Code
         {
             Bubble bubble = _bubbleBuilder.Build(BubbleType.Red, _position);
 
-            BubbleMover bubbleMover = new BubbleMover(bubble, targetPosition, BubbleSpeed);
+            Vector2 direction = (targetPosition - _position).normalized;
 
-            _registerUpdatableObject(bubbleMover);
+            _bubbleMoveBuilder.Build(bubble, direction);
         }
     }
 }
