@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace Code
 {
-    public class UserInput
+    public class UserInput : IUpdatable
     {
         public event EventHandler<Vector2> Shot;
         
