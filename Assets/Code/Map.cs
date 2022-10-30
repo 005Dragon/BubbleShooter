@@ -1,103 +1,124 @@
+using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace Code
 {
     public class Map
     {
-        private readonly Camera _camera;
+        public IReadOnlyCollection<BorderLine> BorderLines => _borderLines;
+
+        public IEnumerable<Vector2> EmployedPositions =>
+            _gridPositionToWorldPositionIndex
+                .Where(x => GetValueFromGrid(x.Key) != null)
+                .Select(x => x.Value);
+
+        public Vector2Int GridSize { get; private set; }
+        public Vector2 ElementSize { get; private set; }
+
         private readonly BorderLine[] _borderLines = new BorderLine[3];
+        private readonly Rect _worldPlayZone;
+        private readonly Dictionary<Vector2Int, Vector2> _gridPositionToWorldPositionIndex = new();
+
+        private Bubble[] _grid;
+        private Vector2 _elementShift;
+        private float _horizontalMargin;
 
         public Map(Camera camera)
         {
-            _camera = camera;
+            Vector2 minPlayZonePoint = camera.ScreenToWorldPoint(Vector3.zero);
+            Vector2 maxPlayZonePoint =
+                camera.ScreenToWorldPoint(new Vector2(camera.pixelWidth, camera.pixelHeight));
+
+            _worldPlayZone = new Rect(minPlayZonePoint, maxPlayZonePoint - minPlayZonePoint);
         }
 
-        public void Construct(float mapWidth)
+        public void Construct(Vector2 elementSize)
         {
-            _borderLines[0] = new BorderLine(Orientation.Horizontal, GetMaxHeight(_camera));
-            _borderLines[1] = new BorderLine(Orientation.Vertical, -mapWidth / 2.0f);
-            _borderLines[2] = new BorderLine(Orientation.Vertical, mapWidth / 2.0f);
-        }
+            ElementSize = elementSize;
+            _elementShift = elementSize / 2.0f;
+            
+            _borderLines[0] = new BorderLine(Orientation.Horizontal, _worldPlayZone.yMax - _elementShift.y);
+            _borderLines[1] = new BorderLine(Orientation.Vertical, _worldPlayZone.xMin + _elementShift.x);
+            _borderLines[2] = new BorderLine(Orientation.Vertical, _worldPlayZone.xMax - _elementShift.y);
 
-        public Vector2 GetIntersectionPoint(Vector2 startPoint, Vector2 direction, out Orientation borderOrientation)
-        {
-            float minIntersectionDistance = float.MaxValue;
-            Vector2 result = default;
-            borderOrientation = default;
+            GridSize = new Vector2Int(
+                (int)((_worldPlayZone.width - _elementShift.x) / ElementSize.x),
+                (int)(_worldPlayZone.height / ElementSize.y)
+            );
 
-            foreach (var borderLine in _borderLines)
+            _horizontalMargin = (_worldPlayZone.width - GridSize.x * ElementSize.x - _elementShift.x) / 2.0f;
+            
+            _grid = new Bubble[GridSize.x * GridSize.y];
+
+            for (int y = 0; y < GridSize.y; y++)
             {
-                if (TryGetIntersection(startPoint, direction, borderLine, out Vector2 intersectionPoint))
+                for (int x = 0; x < GridSize.x; x++)
                 {
-                    float intersectionDistance = (intersectionPoint - startPoint).magnitude; 
-                    
-                    if (intersectionDistance < minIntersectionDistance)
-                    {
-                        minIntersectionDistance = intersectionDistance;
-                        borderOrientation = borderLine.Orientation;
-                        result = intersectionPoint;
-                    }
+                    var gridPosition = new Vector2Int(x, y);
+
+                    _gridPositionToWorldPositionIndex[gridPosition] = CalculateWorldPositionByGridPosition(gridPosition);
                 }
+            }
+        }
+
+        public void AttachToGrid(Vector2Int gridPosition, Bubble bubble, bool setPositionOnGrid = true)
+        {
+            _grid[gridPosition.x + gridPosition.y * GridSize.x] = bubble;
+
+            if (setPositionOnGrid)
+            {
+                bubble.Position = _gridPositionToWorldPositionIndex[gridPosition];
+            }
+        }
+
+        public Vector2Int GetNearestFreeGridPosition(Vector2 position)
+        {
+            var freeGridPositions = _gridPositionToWorldPositionIndex
+                .Where(x => GetValueFromGrid(x.Key) == null);
+
+            float minDistance = float.MaxValue;
+            Vector2Int minDistanceGridPosition = default;
+            
+            foreach (KeyValuePair<Vector2Int,Vector2> gridPositionToWorldPositionPair in freeGridPositions)
+            {
+                float distance = (position - gridPositionToWorldPositionPair.Value).magnitude;
+
+                if (distance < minDistance)
+                {
+                    minDistance = distance;
+                    minDistanceGridPosition = gridPositionToWorldPositionPair.Key;
+                }
+            }
+
+            return minDistanceGridPosition;
+        }
+
+        public Vector2 GetWorldPositionByGridPosition(Vector2Int girdPosition)
+        {
+            return _gridPositionToWorldPositionIndex[girdPosition];
+        }
+        
+        private Vector2 CalculateWorldPositionByGridPosition(Vector2Int girdPosition)
+        {
+            Vector2 result = new Vector2(
+                _worldPlayZone.xMin + _horizontalMargin + _elementShift.x + girdPosition.x * ElementSize.x,
+                _worldPlayZone.yMax - (_elementShift.y + girdPosition.y * ElementSize.y)
+            );
+
+            bool needShift = girdPosition.y % 2 == 0;
+            
+            if (needShift)
+            {
+                result = new Vector2(result.x + _elementShift.x, result.y);
             }
 
             return result;
         }
 
-        private float GetMaxHeight(Camera camera)
+        private Bubble GetValueFromGrid(Vector2Int gridPosition)
         {
-            return camera.ScreenToWorldPoint(new Vector2(0, camera.pixelHeight)).y;
-        }
-
-        private bool TryGetIntersection(
-            Vector2 startPoint, 
-            Vector2 direction, 
-            BorderLine borderLine,
-            out Vector2 intersectionPoint)
-        {
-            if (borderLine.Orientation == Orientation.Horizontal)
-            {
-                float directionToBorder = borderLine.Position - startPoint.y;
-
-                bool intersectionImpossible =
-                    direction.y == 0 ||
-                    direction.y > 0 && directionToBorder < 0 ||
-                    direction.y < 0 && directionToBorder > 0 ||
-                    Mathf.Abs(directionToBorder) < Calculating.Precision;
-
-                if (intersectionImpossible)
-                {
-                    intersectionPoint = default;
-                    return false;
-                }
-
-                float angleCoefficient = direction.x / direction.y;
-
-                intersectionPoint =
-                    new Vector2(startPoint.x + angleCoefficient * directionToBorder, borderLine.Position);
-                return true;
-            }
-            else
-            {
-                float directionToBorder = borderLine.Position - startPoint.x;
-                
-                bool intersectionImpossible =
-                    direction.x == 0 ||
-                    direction.x > 0 && directionToBorder < 0 ||
-                    direction.x < 0 && directionToBorder > 0 || 
-                    Mathf.Abs(directionToBorder) < Calculating.Precision;
-
-                if (intersectionImpossible)
-                {
-                    intersectionPoint = default;
-                    return false;
-                }
-                
-                float angleCoefficient = direction.y / direction.x;
-
-                intersectionPoint =
-                    new Vector2(borderLine.Position, startPoint.y + angleCoefficient * directionToBorder);
-                return true;
-            }
+            return _grid[gridPosition.x + gridPosition.y * GridSize.x];
         }
     }
 }

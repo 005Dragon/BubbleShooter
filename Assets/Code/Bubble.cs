@@ -19,12 +19,15 @@ namespace Code
             }
         }
 
+        public float Diameter { get; }
+
         private Vector2 _position;
 
-        public Bubble(BubbleType bubbleType, Vector2 position)
+        public Bubble(BubbleType bubbleType, Vector2 position, float diameter)
         {
             BubbleType = bubbleType;
             Position = position;
+            Diameter = diameter;
         }
     }
 }

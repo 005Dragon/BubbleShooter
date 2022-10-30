@@ -19,6 +19,7 @@ namespace Code
             _model = (Bubble)Model;
 
             _cachedTransform.position = _model.Position;
+            _cachedTransform.localScale = new Vector2(_model.Diameter, _model.Diameter);
             
             _spriteRenderer.sprite = Sprite;
             _spriteRenderer.color = Color;

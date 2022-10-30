@@ -16,7 +16,7 @@ namespace Code
 
         public bool Update()
         {
-            if (Input.GetMouseButtonUp(0))
+            if (Input.GetMouseButton(0))
             {
                 Shot?.Invoke(this, GetTargetPosition());
             }
