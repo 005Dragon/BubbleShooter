@@ -4,18 +4,18 @@ namespace Code
 {
     public class BubbleBuilder
     {
+        public float Diameter { get; set; } = 1.0f;
+        
         private readonly ViewModelDispatcher _viewModelDispatcher;
-        private readonly float _diameter;
 
-        public BubbleBuilder(float diameter, ViewModelDispatcher viewModelDispatcher)
+        public BubbleBuilder(ViewModelDispatcher viewModelDispatcher)
         {
-            _diameter = diameter;
             _viewModelDispatcher = viewModelDispatcher;
         }
 
         public Bubble Build(BubbleType bubbleType, Vector2 position = default)
         {
-            var bubble = new Bubble(bubbleType, position, _diameter);
+            var bubble = new Bubble(bubbleType, position, Diameter);
 
             _viewModelDispatcher.ConstructViewModel(bubble);
 

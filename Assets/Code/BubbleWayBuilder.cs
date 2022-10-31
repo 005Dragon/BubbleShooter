@@ -6,16 +6,19 @@ namespace Code
 {
     public class BubbleWayBuilder
     {
+        private readonly int _maxIntersections;
+        
         private readonly Map _map;
 
-        public BubbleWayBuilder(Map map)
+        public BubbleWayBuilder(Map map, int maxIntersections)
         {
             _map = map;
+            _maxIntersections = maxIntersections;
         }
 
-        public List<Vector2> Build(Vector2 startPosition, Vector2 direction, int maxIntersections)
+        public List<Vector2> Build(Vector2 startPosition, Vector2 direction)
         {
-            List<Vector2> intersectionPoints = GetIntersectionPoints(startPosition, direction, maxIntersections);
+            List<Vector2> intersectionPoints = GetIntersectionPoints(startPosition, direction, _maxIntersections);
 
             intersectionPoints[^1] =
                 _map.GetWorldPositionByGridPosition(_map.GetNearestFreeGridPosition(intersectionPoints[^1]));

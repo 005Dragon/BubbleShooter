@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -5,46 +6,53 @@ namespace Code
 {
     public class BubbleShooter
     {
-        private readonly Vector2 _position;
+        public Vector2 Position { get; set; }
+        public float BubbleMoveSpeed { get; set; } = 1.0f;
+        public float BubbleDiameter
+        {
+            get => _bubbleBuilder.Diameter;
+            set => _bubbleBuilder.Diameter = value;
+        }
+        public int BubbleMaxIntersections { get; set; } = 20;
+        
         private readonly BubbleBuilder _bubbleBuilder;
-        private readonly BubbleMoveBuilder _bubbleMoveBuilder;
         private readonly BubbleWayBuilder _bubbleWayBuilder;
-        private readonly Map _map;
         private readonly BubbleExploder _bubbleExploder;
 
+        private readonly Map _map;
+        private readonly Action<IUpdatable> _addToUpdate;
+        
         private Bubble _readyBubble;
 
         public BubbleShooter(
-            Vector2 position, 
-            BubbleBuilder bubbleBuilder, 
-            BubbleMoveBuilder bubbleMoveBuilder,
-            BubbleWayBuilder bubbleWayBuilder,
             Map map,
-            UserInput userInput)
+            UserInput userInput,
+            Action<IUpdatable> addToUpdate,
+            ViewModelDispatcher viewModelDispatcher)
         {
-            _position = position;
-            _bubbleBuilder = bubbleBuilder;
-            _bubbleMoveBuilder = bubbleMoveBuilder;
-            _bubbleWayBuilder = bubbleWayBuilder;
             _map = map;
+            _addToUpdate = addToUpdate;
 
-            _bubbleExploder = new BubbleExploder(map, bubbleBuilder);
+            _bubbleBuilder = new BubbleBuilder(viewModelDispatcher);
+            _bubbleWayBuilder = new BubbleWayBuilder(map, BubbleMaxIntersections);
+            _bubbleExploder = new BubbleExploder(map, _bubbleBuilder);
 
             userInput.Shot += UserInputOnShot;
         }
 
         public void Charge()
         {
-            _readyBubble = _bubbleBuilder.Build(BubbleService.GetRandomType(), _position);
+            _readyBubble = _bubbleBuilder.Build(BubbleService.GetRandomType(), Position);
         }
 
         private void UserInputOnShot(object sender, Vector2 targetPosition)
         {
-            Vector2 direction = (targetPosition - _position).normalized;
+            Vector2 direction = (targetPosition - Position).normalized;
 
-            List<Vector2> bubbleWay =_bubbleWayBuilder.Build(_position, direction, 10);
-
-            BubbleMover bubbleMover = _bubbleMoveBuilder.Build(_readyBubble, bubbleWay);
+            List<Vector2> bubbleWay =_bubbleWayBuilder.Build(Position, direction);
+            
+            var bubbleMover = new BubbleMover(_readyBubble, BubbleMoveSpeed, bubbleWay);
+            _addToUpdate.Invoke(bubbleMover);
             bubbleMover.MoveFinished += BubbleMoverOnMoveFinished;
 
             _map.Attach(_map.GetNearestFreeGridPosition(bubbleWay[^1]), _readyBubble, false);

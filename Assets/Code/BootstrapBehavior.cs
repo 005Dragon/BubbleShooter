@@ -17,8 +17,8 @@ namespace Code
         [Header("Storages")] 
         [SerializeField] private BubbleViewStorage _bubbleViewStorage;
 
-        private BubbleWayBuilder _bubbleWayBuilder;
         private UserInput _userInput;
+        private BubbleWayBuilder _debugBubbleWayBuilder;
 
         private void Awake()
         {
@@ -34,20 +34,14 @@ namespace Code
             var map = new Map(_mainCamera);
             map.Construct(new Vector2(_bubbleDiameter, _bubbleDiameter));
 
-            var bubbleBuilder = new BubbleBuilder(_bubbleDiameter, viewModelDispatcher);
-            var bubbleMoveBuilder = new BubbleMoveBuilder(_bubbleSpeed, updateBehavior);
-            _bubbleWayBuilder = new BubbleWayBuilder(map);
-            
-            new BubbleExploder(map, bubbleBuilder);
-            
-            var bubbleShooter = new BubbleShooter(
-                _bubbleShooterSpawner.position,
-                bubbleBuilder,
-                bubbleMoveBuilder,
-                _bubbleWayBuilder,
-                map,
-                _userInput
-            );
+            _debugBubbleWayBuilder = new BubbleWayBuilder(map, 4);
+
+            var bubbleShooter = new BubbleShooter(map, _userInput, updateBehavior.AddToUpdate, viewModelDispatcher)
+            {
+                Position = _bubbleShooterSpawner.position,
+                BubbleMoveSpeed = _bubbleSpeed,
+                BubbleDiameter = _bubbleDiameter
+            };
             
             bubbleShooter.Charge();
         }
@@ -61,7 +55,7 @@ namespace Code
                     (_userInput.GetTargetPosition() - (Vector2)_bubbleShooterSpawner.position).normalized;
             
                 List<Vector2> points =
-                    _bubbleWayBuilder.Build(_bubbleShooterSpawner.position, direction, 3);
+                    _debugBubbleWayBuilder.Build(_bubbleShooterSpawner.position, direction);
 
                 Vector2 lastPoint = _bubbleShooterSpawner.position;
 
