@@ -13,6 +13,7 @@ namespace Code
             set => _bubbleBuilder.Diameter = value;
         }
         public int BubbleMaxIntersections { get; set; } = 20;
+        public float MaxAngle { get; set; } = 70.0f;
         
         private readonly BubbleBuilder _bubbleBuilder;
         private readonly BubbleWayBuilder _bubbleWayBuilder;
@@ -47,6 +48,11 @@ namespace Code
         private void UserInputOnShot(object sender, Vector2 targetPosition)
         {
             Vector2 direction = (targetPosition - Position).normalized;
+
+            if (Mathf.Abs(Mathf.Atan2(direction.x, direction.y)) > MaxAngle * Mathf.Deg2Rad)
+            {
+                return;
+            }
 
             List<Vector2> bubbleWay =_bubbleWayBuilder.Build(Position, direction);
             
