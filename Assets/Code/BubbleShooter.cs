@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -20,22 +19,22 @@ namespace Code
         private readonly BubbleExploder _bubbleExploder;
 
         private readonly Map _map;
-        private readonly Action<IUpdatable> _addToUpdate;
-        
+        private readonly BubbleMoverDispatcher _bubbleMoverDispatcher;
+
         private Bubble _readyBubble;
 
         public BubbleShooter(
             Map map,
             UserInput userInput,
-            Action<IUpdatable> addToUpdate,
+            BubbleMoverDispatcher bubbleMoverDispatcher,
             ViewModelDispatcher viewModelDispatcher)
         {
             _map = map;
-            _addToUpdate = addToUpdate;
+            _bubbleMoverDispatcher = bubbleMoverDispatcher;
 
             _bubbleBuilder = new BubbleBuilder(viewModelDispatcher);
             _bubbleWayBuilder = new BubbleWayBuilder(map, BubbleMaxIntersections);
-            _bubbleExploder = new BubbleExploder(map, _bubbleBuilder);
+            _bubbleExploder = new BubbleExploder(map, bubbleMoverDispatcher);
 
             userInput.Shot += UserInputOnShot;
         }
@@ -52,7 +51,7 @@ namespace Code
             List<Vector2> bubbleWay =_bubbleWayBuilder.Build(Position, direction);
             
             var bubbleMover = new BubbleMover(_readyBubble, BubbleMoveSpeed, bubbleWay);
-            _addToUpdate.Invoke(bubbleMover);
+            _bubbleMoverDispatcher.Register(_readyBubble, bubbleMover);
             bubbleMover.MoveFinished += BubbleMoverOnMoveFinished;
 
             _map.Attach(_map.GetNearestFreeGridPosition(bubbleWay[^1]), _readyBubble, false);
@@ -63,6 +62,8 @@ namespace Code
         private void BubbleMoverOnMoveFinished(object sender, Bubble bubble)
         {
             _bubbleExploder.TryExplosionGridChain(bubble);
+            var bubbleMover = (BubbleMover)sender;
+            bubbleMover.MoveFinished -= BubbleMoverOnMoveFinished;
         }
     }
 }

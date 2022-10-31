@@ -26,17 +26,19 @@ namespace Code
             
             var bubbleService = new BubbleService(_bubbleViewStorage);
 
-            ViewModelDispatcher viewModelDispatcher = new ViewModelDispatcher(GetViewBuilders(bubbleService));
-            
+            var viewModelDispatcher = new ViewModelDispatcher(GetViewBuilders(bubbleService));
+            var bubbleMoverDispatcher = new BubbleMoverDispatcher();
             _userInput = new UserInput(_mainCamera);
+            
             updateBehavior.AddToUpdate(_userInput);
+            updateBehavior.AddToUpdate(bubbleMoverDispatcher);
             
             var map = new Map(_mainCamera);
             map.Construct(new Vector2(_bubbleDiameter, _bubbleDiameter));
 
             _debugBubbleWayBuilder = new BubbleWayBuilder(map, 4);
 
-            var bubbleShooter = new BubbleShooter(map, _userInput, updateBehavior.AddToUpdate, viewModelDispatcher)
+            var bubbleShooter = new BubbleShooter(map, _userInput, bubbleMoverDispatcher, viewModelDispatcher)
             {
                 Position = _bubbleShooterSpawner.position,
                 BubbleMoveSpeed = _bubbleSpeed,

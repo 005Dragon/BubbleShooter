@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -8,6 +7,9 @@ namespace Code
     public class Map
     {
         public IReadOnlyCollection<BorderLine> BorderLines => _borderLines;
+
+        public IEnumerable<Vector2Int> GridPositions => 
+            Enumerable.Range(0, _grid.Length).Select(x => new Vector2Int(x % GridSize.x, x / GridSize.x));
 
         public IEnumerable<Vector2> EmployedPositions =>
             _gridPositionToWorldPositionIndex
@@ -131,7 +133,7 @@ namespace Code
             {
                 yield return new Vector2Int(gridPosition.x, gridPosition.y - 1);
 
-                if (gridPosition.x % 2 == 0)
+                if (gridPosition.y % 2 == 0)
                 {
                     if (gridPosition.x < GridSize.x - 1)
                     {
@@ -151,7 +153,7 @@ namespace Code
             {
                 yield return new Vector2Int(gridPosition.x, gridPosition.y + 1);
                 
-                if (gridPosition.x % 2 == 0)
+                if (gridPosition.y % 2 == 0)
                 {
                     if (gridPosition.x < GridSize.x - 1)
                     {
@@ -168,17 +170,19 @@ namespace Code
             }
         }
 
-        public Vector2Int GetGridPosition(Bubble bubble)
+        public bool TryGetGridPosition(Bubble bubble, out Vector2Int gridPosition)
         {
             for (int i = 0; i < _grid.Length; i++)
             {
                 if (_grid[i] == bubble)
                 {
-                    return new Vector2Int(i % GridSize.x, i / GridSize.x);
+                    gridPosition = new Vector2Int(i % GridSize.x, i / GridSize.x);
+                    return true;
                 }
             }
 
-            throw new Exception("The bubble not belong this map.");
+            gridPosition = default;
+            return false;
         }
 
         private Vector2 CalculateWorldPositionByGridPosition(Vector2Int girdPosition)

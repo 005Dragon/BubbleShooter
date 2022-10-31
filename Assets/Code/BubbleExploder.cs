@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace Code
@@ -6,23 +7,27 @@ namespace Code
     public class BubbleExploder
     {
         public int MinChainLength { get; set; } = 3;
+        public float ExplosionForce { get; set; } = 1.0f;
         
         private readonly Map _map;
-        private readonly BubbleBuilder _bubbleBuilder;
+        private readonly BubbleMoverDispatcher _bubbleMoverDispatcher;
 
-        public BubbleExploder(Map map, BubbleBuilder bubbleBuilder)
+        public BubbleExploder(Map map, BubbleMoverDispatcher bubbleMoverDispatcher)
         {
             _map = map;
-            _bubbleBuilder = bubbleBuilder;
+            _bubbleMoverDispatcher = bubbleMoverDispatcher;
         }
 
         public bool TryExplosionGridChain(Bubble bubble)
         {
             BubbleType bubbleType = bubble.BubbleType;
 
-            List<Vector2Int> chainGridPositions = new();
-
-            Vector2Int gridPosition = _map.GetGridPosition(bubble);
+            if (!_map.TryGetGridPosition(bubble, out Vector2Int gridPosition))
+            {
+                return false;
+            }
+            
+            HashSet<Vector2Int> chainGridPositions = new();
             
             FillChainGridPositions(chainGridPositions, bubbleType, gridPosition);
 
@@ -31,7 +36,16 @@ namespace Code
                 foreach (Vector2Int chainGridPosition in chainGridPositions)
                 {
                     Bubble detachedBubble = _map.Detach(chainGridPosition);
-                    detachedBubble.Destroy();
+                    Explosion(detachedBubble, bubble.Position);
+                }
+
+                IEnumerable<Vector2Int> gridPositionsWithoutSupport = 
+                    _map.GridPositions.Where(x => _map[x] != null).Except(GetGridPositionsWithSupport());
+
+                foreach (Vector2Int gridPositionWithoutSupport in gridPositionsWithoutSupport)
+                {
+                    Bubble detachedBubble = _map.Detach(gridPositionWithoutSupport);
+                    Explosion(detachedBubble, bubble.Position);
                 }
 
                 return true;
@@ -40,31 +54,76 @@ namespace Code
             return false;
         }
 
+        private HashSet<Vector2Int> GetGridPositionsWithSupport()
+        {
+            var result = new HashSet<Vector2Int>();
+
+            IEnumerable<Vector2Int> mainSupportGridPositions = Enumerable
+                .Range(0, _map.GridSize.x)
+                .Select(x => new Vector2Int(x, 0))
+                .Where(x => _map[x] != null);
+
+            foreach (Vector2Int gridPosition in mainSupportGridPositions)
+            {
+                FillArea(gridPosition);
+            }
+
+            return result;
+
+            void FillArea(Vector2Int gridPosition)
+            {
+                if (result.Add(gridPosition))
+                {
+                    IEnumerable<Vector2Int> area = _map.GetAreaGridPositions(gridPosition).Where(x => _map[x] != null);
+                    
+                    foreach (Vector2Int areaGridPosition in area)
+                    {
+                        FillArea(areaGridPosition);
+                    }
+                }
+            }
+        }
+
         private void FillChainGridPositions(
-            ICollection<Vector2Int> chainGridPositions, 
+            HashSet<Vector2Int> chainGridPositions, 
             BubbleType bubbleType, 
             Vector2Int gridPosition,
             List<Vector2Int> excludedGridPositions = null)
         {
             excludedGridPositions ??= new List<Vector2Int>();
 
-            foreach (Vector2Int areaGridPosition in _map.GetAreaGridPositions(gridPosition))
+            if (excludedGridPositions.Contains(gridPosition))
             {
-                if (excludedGridPositions.Contains(areaGridPosition))
+                return;
+            }
+            
+            excludedGridPositions.Add(gridPosition);
+
+            Bubble bubble = _map[gridPosition];
+
+            if (bubble != null && bubble.BubbleType == bubbleType)
+            {
+                chainGridPositions.Add(gridPosition);
+
+                foreach (Vector2Int areaGridPosition in _map.GetAreaGridPositions(gridPosition))
                 {
-                    continue;
-                }
-
-                excludedGridPositions.Add(areaGridPosition);
-
-                Bubble bubble = _map[areaGridPosition];
-
-                if (bubble != null && bubble.BubbleType == bubbleType)
-                {
-                    chainGridPositions.Add(areaGridPosition);
                     FillChainGridPositions(chainGridPositions, bubbleType, areaGridPosition, excludedGridPositions);
                 }
             }
+        }
+
+        private void Explosion(Bubble bubble, Vector2 explosionCenter)
+        {
+            var bubbleExplosionMover = new BubbleExplosionMover(bubble, explosionCenter, ExplosionForce);
+            _bubbleMoverDispatcher.Register(bubble, bubbleExplosionMover);
+            bubbleExplosionMover.MoveFinished += BubbleExplosionMoverOnMoveFinished;
+        }
+
+        private void BubbleExplosionMoverOnMoveFinished(object sender, Bubble bubble)
+        {
+            bubble.Destroy();
+            var bubbleExplosionMover = (BubbleExplosionMover)sender;
+            bubbleExplosionMover.MoveFinished -= BubbleExplosionMoverOnMoveFinished;
         }
     }
 }
