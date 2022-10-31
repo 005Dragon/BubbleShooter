@@ -42,7 +42,7 @@ namespace Code
 
         public void Charge()
         {
-            _readyBubble = _bubbleBuilder.Build(BubbleService.GetRandomType(), Position);
+            _readyBubble = _bubbleBuilder.Build(BubbleType.Green, Position);
         }
 
         private void UserInputOnShot(object sender, Vector2 targetPosition)

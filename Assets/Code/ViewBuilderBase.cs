@@ -22,16 +22,28 @@ namespace Code
             {
                 throw new Exception("This builder not be use for this model.");
             }
-            
-            var gameObject = new GameObject();
-            gameObject.transform.SetParent(_root);
 
-            TView view = CreateView(gameObject, (TModel)model);
+            var typedModel = (TModel)model;
+
+            if (!TryGetViewFromPool(typedModel, out TView view))
+            {
+                var gameObject = new GameObject();
+                gameObject.transform.SetParent(_root);
+
+                view = CreateView(gameObject, typedModel);
+            }
+            
             view.Initialize();
 
             return view;
         }
 
         protected abstract TView CreateView(GameObject gameObject, TModel model);
+
+        protected virtual bool TryGetViewFromPool(TModel model, out TView view)
+        {
+            view = default;
+            return false;
+        }
     }
 }
