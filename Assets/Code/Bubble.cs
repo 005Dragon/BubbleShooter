@@ -6,6 +6,7 @@ namespace Code
     public class Bubble : IModel
     {
         public event EventHandler<Vector2> PositionChanged;
+        public event EventHandler Destroyed;
         
         public BubbleType BubbleType { get; }
 
@@ -20,7 +21,7 @@ namespace Code
         }
 
         public float Diameter { get; }
-
+        
         private Vector2 _position;
 
         public Bubble(BubbleType bubbleType, Vector2 position, float diameter)
@@ -28,6 +29,11 @@ namespace Code
             BubbleType = bubbleType;
             Position = position;
             Diameter = diameter;
+        }
+
+        public void Destroy()
+        {
+            Destroyed?.Invoke(this, EventArgs.Empty);
         }
     }
 }

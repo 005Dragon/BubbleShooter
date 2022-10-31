@@ -21,5 +21,9 @@ namespace Code
 
             return bubble;
         }
+
+        public void Destroy(Bubble bubble)
+        {
+        }
     }
 }

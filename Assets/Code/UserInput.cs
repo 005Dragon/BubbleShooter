@@ -7,6 +7,8 @@ namespace Code
     {
         public event EventHandler<Vector2> Shot;
         
+        public bool Aiming { get; private set; }
+        
         private readonly Camera _camera;
 
         public UserInput(Camera camera)
@@ -16,9 +18,15 @@ namespace Code
 
         public bool Update()
         {
-            if (Input.GetMouseButton(0))
+            if (Input.GetMouseButtonDown(0))
+            {
+                Aiming = true;
+            }
+            
+            if (Aiming && Input.GetMouseButtonUp(0))
             {
                 Shot?.Invoke(this, GetTargetPosition());
+                Aiming = false;
             }
 
             return true;

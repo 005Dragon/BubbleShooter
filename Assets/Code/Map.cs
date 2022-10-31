@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -10,9 +11,15 @@ namespace Code
 
         public IEnumerable<Vector2> EmployedPositions =>
             _gridPositionToWorldPositionIndex
-                .Where(x => GetValueFromGrid(x.Key) != null)
+                .Where(x => this[x.Key] != null)
                 .Select(x => x.Value);
 
+        public Bubble this[Vector2Int gridPosition]
+        {
+            get => _grid[gridPosition.x + gridPosition.y * GridSize.x];
+            set => _grid[gridPosition.x + gridPosition.y * GridSize.x] = value;
+        }
+        
         public Vector2Int GridSize { get; private set; }
         public Vector2 ElementSize { get; private set; }
 
@@ -62,9 +69,9 @@ namespace Code
             }
         }
 
-        public void AttachToGrid(Vector2Int gridPosition, Bubble bubble, bool setPositionOnGrid = true)
+        public void Attach(Vector2Int gridPosition, Bubble bubble, bool setPositionOnGrid = true)
         {
-            _grid[gridPosition.x + gridPosition.y * GridSize.x] = bubble;
+            this[gridPosition] = bubble;
 
             if (setPositionOnGrid)
             {
@@ -72,10 +79,19 @@ namespace Code
             }
         }
 
+        public Bubble Detach(Vector2Int gridPosition)
+        {
+            Bubble detachedBubble = this[gridPosition];
+            
+            this[gridPosition] = null;
+
+            return detachedBubble;
+        }
+
         public Vector2Int GetNearestFreeGridPosition(Vector2 position)
         {
-            var freeGridPositions = _gridPositionToWorldPositionIndex
-                .Where(x => GetValueFromGrid(x.Key) == null);
+            IEnumerable<KeyValuePair<Vector2Int, Vector2>> freeGridPositions = 
+                _gridPositionToWorldPositionIndex.Where(x => this[x.Key] == null);
 
             float minDistance = float.MaxValue;
             Vector2Int minDistanceGridPosition = default;
@@ -98,7 +114,73 @@ namespace Code
         {
             return _gridPositionToWorldPositionIndex[girdPosition];
         }
-        
+
+        public IEnumerable<Vector2Int> GetAreaGridPositions(Vector2Int gridPosition)
+        {
+            if (gridPosition.x > 0)
+            {
+                yield return new Vector2Int(gridPosition.x - 1, gridPosition.y);
+            }
+
+            if (gridPosition.x < GridSize.x - 1)
+            {
+                yield return new Vector2Int(gridPosition.x + 1, gridPosition.y);
+            }
+
+            if (gridPosition.y > 0)
+            {
+                yield return new Vector2Int(gridPosition.x, gridPosition.y - 1);
+
+                if (gridPosition.x % 2 == 0)
+                {
+                    if (gridPosition.x < GridSize.x - 1)
+                    {
+                        yield return new Vector2Int(gridPosition.x + 1, gridPosition.y - 1);
+                    }
+                }
+                else
+                {
+                    if (gridPosition.x > 0)
+                    {
+                        yield return new Vector2Int(gridPosition.x - 1, gridPosition.y - 1);
+                    }
+                }
+            }
+
+            if (gridPosition.y < GridSize.y - 1)
+            {
+                yield return new Vector2Int(gridPosition.x, gridPosition.y + 1);
+                
+                if (gridPosition.x % 2 == 0)
+                {
+                    if (gridPosition.x < GridSize.x - 1)
+                    {
+                        yield return new Vector2Int(gridPosition.x + 1, gridPosition.y + 1);
+                    }
+                }
+                else
+                {
+                    if (gridPosition.x > 0)
+                    {
+                        yield return new Vector2Int(gridPosition.x - 1, gridPosition.y + 1);
+                    }
+                }
+            }
+        }
+
+        public Vector2Int GetGridPosition(Bubble bubble)
+        {
+            for (int i = 0; i < _grid.Length; i++)
+            {
+                if (_grid[i] == bubble)
+                {
+                    return new Vector2Int(i % GridSize.x, i / GridSize.x);
+                }
+            }
+
+            throw new Exception("The bubble not belong this map.");
+        }
+
         private Vector2 CalculateWorldPositionByGridPosition(Vector2Int girdPosition)
         {
             Vector2 result = new Vector2(
@@ -114,11 +196,6 @@ namespace Code
             }
 
             return result;
-        }
-
-        private Bubble GetValueFromGrid(Vector2Int gridPosition)
-        {
-            return _grid[gridPosition.x + gridPosition.y * GridSize.x];
         }
     }
 }

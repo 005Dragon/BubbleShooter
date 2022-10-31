@@ -9,7 +9,7 @@ namespace Code
 
         public void AddToUpdate(IUpdatable updatableObject) => _updatableObjects.Add(updatableObject);
 
-        private void FixedUpdate()
+        private void Update()
         {
             _updatableObjects.RemoveAll(x => !x.Update());
         }

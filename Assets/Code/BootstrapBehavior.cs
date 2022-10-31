@@ -37,16 +37,10 @@ namespace Code
             var bubbleBuilder = new BubbleBuilder(_bubbleDiameter, viewModelDispatcher);
             var bubbleMoveBuilder = new BubbleMoveBuilder(_bubbleSpeed, updateBehavior);
             _bubbleWayBuilder = new BubbleWayBuilder(map);
-
-            for (int ii = 0; ii < 3; ii++)
-            {
-                for (int i = 0; i < map.GridSize.x; i++)
-                {
-                    map.AttachToGrid(new Vector2Int(i, ii), bubbleBuilder.Build(BubbleService.GetRandomType()));
-                }
-            }
-
-            new BubbleShooter(
+            
+            new BubbleExploder(map, bubbleBuilder);
+            
+            var bubbleShooter = new BubbleShooter(
                 _bubbleShooterSpawner.position,
                 bubbleBuilder,
                 bubbleMoveBuilder,
@@ -54,24 +48,30 @@ namespace Code
                 map,
                 _userInput
             );
+            
+            bubbleShooter.Charge();
         }
 
         // TODO delete after debug.
         private void Update()
         {
-            Vector2 direction = (_userInput.GetTargetPosition() - (Vector2)_bubbleShooterSpawner.position).normalized;
-            
-            List<Vector2> points =
-                _bubbleWayBuilder.Build(_bubbleShooterSpawner.position, direction, 3);
-
-            Vector2 lastPoint = _bubbleShooterSpawner.position;
-
-            foreach (Vector2 point in points)
+            if (_userInput.Aiming)
             {
-                Debug.DrawLine(lastPoint, point, Color.black);
-                lastPoint = point;
-            }
+                Vector2 direction = 
+                    (_userInput.GetTargetPosition() - (Vector2)_bubbleShooterSpawner.position).normalized;
             
+                List<Vector2> points =
+                    _bubbleWayBuilder.Build(_bubbleShooterSpawner.position, direction, 3);
+
+                Vector2 lastPoint = _bubbleShooterSpawner.position;
+
+                foreach (Vector2 point in points)
+                {
+                    Debug.DrawLine(lastPoint, point, Color.black);
+                    lastPoint = point;
+                }
+            }
+
             Debug.DrawLine(_bubbleShooterSpawner.position, _userInput.GetTargetPosition(), Color.red);
         }
 

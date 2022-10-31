@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 namespace Code
@@ -25,6 +26,7 @@ namespace Code
             _spriteRenderer.color = Color;
             
             _model.PositionChanged += ModelOnPositionChanged;
+            _model.Destroyed += ModelOnDestroyed;
         }
 
         private void Awake()
@@ -36,6 +38,14 @@ namespace Code
         private void ModelOnPositionChanged(object sender, Vector2 position)
         {
             _cachedTransform.position = position;
+        }
+
+        private void ModelOnDestroyed(object sender, EventArgs eventArgs)
+        {
+            _model.PositionChanged -= ModelOnPositionChanged;
+            _model.Destroyed -= ModelOnDestroyed;
+            
+            gameObject.SetActive(false);
         }
     }
 }

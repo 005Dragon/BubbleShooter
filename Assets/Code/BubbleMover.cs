@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -5,6 +6,8 @@ namespace Code
 {
     public class BubbleMover : IUpdatable
     {
+        public event EventHandler<Bubble> MoveFinished;
+        
         private readonly Bubble _bubble;
         private readonly float _speed;
         private readonly Queue<Vector2> _targetPositions = new();
@@ -39,6 +42,7 @@ namespace Code
 
                 if (!hasNextTarget)
                 {
+                    MoveFinished?.Invoke(this, _bubble);
                     return false;
                 }
             }

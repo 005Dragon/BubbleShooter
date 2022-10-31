@@ -10,6 +10,9 @@ namespace Code
         private readonly BubbleMoveBuilder _bubbleMoveBuilder;
         private readonly BubbleWayBuilder _bubbleWayBuilder;
         private readonly Map _map;
+        private readonly BubbleExploder _bubbleExploder;
+
+        private Bubble _readyBubble;
 
         public BubbleShooter(
             Vector2 position, 
@@ -25,20 +28,33 @@ namespace Code
             _bubbleWayBuilder = bubbleWayBuilder;
             _map = map;
 
+            _bubbleExploder = new BubbleExploder(map, bubbleBuilder);
+
             userInput.Shot += UserInputOnShot;
+        }
+
+        public void Charge()
+        {
+            _readyBubble = _bubbleBuilder.Build(BubbleService.GetRandomType(), _position);
         }
 
         private void UserInputOnShot(object sender, Vector2 targetPosition)
         {
-            Bubble bubble = _bubbleBuilder.Build(BubbleService.GetRandomType(), _position);
-
             Vector2 direction = (targetPosition - _position).normalized;
 
             List<Vector2> bubbleWay =_bubbleWayBuilder.Build(_position, direction, 10);
 
-            _bubbleMoveBuilder.Build(bubble, bubbleWay);
+            BubbleMover bubbleMover = _bubbleMoveBuilder.Build(_readyBubble, bubbleWay);
+            bubbleMover.MoveFinished += BubbleMoverOnMoveFinished;
 
-            _map.AttachToGrid(_map.GetNearestFreeGridPosition(bubbleWay[^1]), bubble, false);
+            _map.Attach(_map.GetNearestFreeGridPosition(bubbleWay[^1]), _readyBubble, false);
+            
+            Charge();
+        }
+
+        private void BubbleMoverOnMoveFinished(object sender, Bubble bubble)
+        {
+            _bubbleExploder.TryExplosionGridChain(bubble);
         }
     }
 }
