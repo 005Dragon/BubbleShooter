@@ -1,7 +1,9 @@
 using System;
 using System.Collections.Generic;
+using Code.Builders;
+using Code.Models;
 
-namespace Code
+namespace Code.Views
 {
     public class ViewModelDispatcher
     {

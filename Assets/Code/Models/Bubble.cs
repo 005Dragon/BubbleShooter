@@ -1,7 +1,8 @@
 using System;
+using Code.Common;
 using UnityEngine;
 
-namespace Code
+namespace Code.Models
 {
     public class Bubble : IModel
     {

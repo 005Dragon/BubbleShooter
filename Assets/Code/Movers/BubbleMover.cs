@@ -1,8 +1,10 @@
 using System;
 using System.Collections.Generic;
+using Code.Common;
+using Code.Models;
 using UnityEngine;
 
-namespace Code
+namespace Code.Movers
 {
     public class BubbleMover : IUpdatable
     {

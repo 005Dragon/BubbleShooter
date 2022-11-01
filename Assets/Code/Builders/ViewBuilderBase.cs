@@ -1,7 +1,9 @@
 using System;
+using Code.Models;
+using Code.Views;
 using UnityEngine;
 
-namespace Code
+namespace Code.Builders
 {
     public abstract class ViewBuilderBase<TModel, TView> : IViewBuilder
         where TModel : IModel

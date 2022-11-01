@@ -1,8 +1,10 @@
 using System.Collections.Generic;
 using System.Linq;
+using Code.Common;
+using Code.Movers;
 using UnityEngine;
 
-namespace Code
+namespace Code.Models
 {
     public class BubbleExploder
     {

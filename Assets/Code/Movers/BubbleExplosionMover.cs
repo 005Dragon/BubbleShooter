@@ -1,7 +1,9 @@
 using System;
+using Code.Common;
+using Code.Models;
 using UnityEngine;
 
-namespace Code
+namespace Code.Movers
 {
     public class BubbleExplosionMover : IUpdatable
     {

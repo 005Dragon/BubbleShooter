@@ -1,4 +1,6 @@
-namespace Code
+using Code.Common;
+
+namespace Code.Models
 {
     public class BorderLine
     {

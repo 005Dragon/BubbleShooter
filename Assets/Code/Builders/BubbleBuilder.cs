@@ -1,6 +1,9 @@
+using Code.Common;
+using Code.Models;
+using Code.Views;
 using UnityEngine;
 
-namespace Code
+namespace Code.Builders
 {
     public class BubbleBuilder
     {

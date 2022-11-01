@@ -1,8 +1,12 @@
 using System.Collections.Generic;
 using System.Linq;
+using Code.Common;
+using Code.Models;
+using Code.Services;
+using Code.Views;
 using UnityEngine;
 
-namespace Code
+namespace Code.Builders
 {
     public class BubbleViewBuilder : ViewBuilderBase<Bubble, BubbleView>
     {

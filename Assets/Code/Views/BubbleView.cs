@@ -1,7 +1,8 @@
 using System;
+using Code.Models;
 using UnityEngine;
 
-namespace Code
+namespace Code.Views
 {
     [RequireComponent(typeof(SpriteRenderer))]
     public class BubbleView : MonoBehaviour, IView

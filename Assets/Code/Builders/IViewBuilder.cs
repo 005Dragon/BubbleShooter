@@ -1,6 +1,8 @@
 using System;
+using Code.Models;
+using Code.Views;
 
-namespace Code
+namespace Code.Builders
 {
     public interface IViewBuilder
     {

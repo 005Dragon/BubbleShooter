@@ -1,6 +1,7 @@
+using Code.Common;
 using UnityEngine;
 
-namespace Code
+namespace Code.Storage
 {
     [CreateAssetMenu(menuName = "Game/" + nameof(StorableBubbleView), fileName = nameof(StorableBubbleView))]
     public class StorableBubbleView : ScriptableObject

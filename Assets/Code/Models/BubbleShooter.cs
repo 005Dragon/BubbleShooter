@@ -1,7 +1,11 @@
 using System.Collections.Generic;
+using Code.Builders;
+using Code.Common;
+using Code.Movers;
+using Code.Views;
 using UnityEngine;
 
-namespace Code
+namespace Code.Models
 {
     public class BubbleShooter
     {

@@ -1,10 +1,12 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Code.Common;
+using Code.Storage;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
-namespace Code
+namespace Code.Services
 {
     public class BubbleService
     {

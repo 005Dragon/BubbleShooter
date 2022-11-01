@@ -1,4 +1,6 @@
-namespace Code
+using Code.Models;
+
+namespace Code.Views
 {
     public interface IView
     {

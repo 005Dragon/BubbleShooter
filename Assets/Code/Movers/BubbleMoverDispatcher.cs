@@ -1,7 +1,9 @@
 using System.Collections.Generic;
 using System.Linq;
+using Code.Common;
+using Code.Models;
 
-namespace Code
+namespace Code.Movers
 {
     public class BubbleMoverDispatcher : IUpdatable
     {

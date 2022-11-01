@@ -1,8 +1,10 @@
 using System.Collections.Generic;
 using System.Linq;
+using Code.Common;
+using Code.Models;
 using UnityEngine;
 
-namespace Code
+namespace Code.Builders
 {
     public class BubbleWayBuilder
     {
