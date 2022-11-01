@@ -12,6 +12,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2e8c4caf41294a23be97049403ba8c40, type: 3}
   m_Name: YellowBubble
   m_EditorClassIdentifier: 
-  _bubbleType: 3
+  _bubbleType: 4
   _sprite: {fileID: 21300000, guid: 26926f27018670141b578ec6da34c1b3, type: 3}
   _color: {r: 0.96420634, g: 1, b: 0, a: 1}

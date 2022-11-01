@@ -6,8 +6,8 @@ namespace Code.Storage
     [CreateAssetMenu(menuName = "Game/" + nameof(BubbleViewStorage), fileName = nameof(BubbleViewStorage))]
     public class BubbleViewStorage : ScriptableObject
     {
-        [SerializeField] private List<StorableBubbleView> _snakeSprites;
+        [SerializeField] private List<BubbleViewData> _bubbleViews;
 
-        public IReadOnlyList<StorableBubbleView> SnakeSprites => _snakeSprites;
+        public IReadOnlyList<BubbleViewData> BubbleViews => _bubbleViews;
     }
 }

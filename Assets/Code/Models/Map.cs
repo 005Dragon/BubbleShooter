@@ -90,6 +90,11 @@ namespace Code.Models
         public Bubble Detach(Vector2Int gridPosition)
         {
             Bubble detachedBubble = this[gridPosition];
+
+            if (detachedBubble == null)
+            {
+                return null;
+            }
             
             this[gridPosition] = null;
 
@@ -97,7 +102,7 @@ namespace Code.Models
             
             return detachedBubble;
         }
-
+        
         public Vector2Int GetNearestFreeGridPosition(Vector2 position)
         {
             IEnumerable<KeyValuePair<Vector2Int, Vector2>> freeGridPositions = 

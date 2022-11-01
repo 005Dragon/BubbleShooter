@@ -20,7 +20,7 @@ namespace Code.Movers
         private float _distance;
 
 
-        public BubbleMover(Bubble bubble, float speed, IEnumerable<Vector2> targetPositions)
+        public BubbleMover(Bubble bubble, float speed, params Vector2[] targetPositions)
         {
             _bubble = bubble;
             _speed = speed;

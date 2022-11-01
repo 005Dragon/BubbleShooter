@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using Code.Builders;
+using Code.Common;
 using Code.Models;
 using Code.Movers;
 using Code.Services;
@@ -16,12 +17,14 @@ namespace Code
         [SerializeField] private Camera _mainCamera;
 
         [Header("Settings")] 
+        [SerializeField] private LevelKey _level;
         [SerializeField] private Transform _bubbleShooterSpawner;
         [SerializeField] private float _bubbleSpeed;
         [SerializeField] private float _bubbleDiameter;
 
         [Header("Storages")] 
         [SerializeField] private BubbleViewStorage _bubbleViewStorage;
+        [SerializeField] private LevelStorage _levelStorage;
 
         private UserInput _userInput;
         private BubbleWayBuilder _debugBubbleWayBuilder;
@@ -31,6 +34,7 @@ namespace Code
             var updateBehavior = GetComponent<UpdateBehavior>();
             
             var bubbleService = new BubbleService(_bubbleViewStorage);
+            var levelService = new LevelService(_levelStorage);
 
             var viewModelDispatcher = new ViewModelDispatcher(GetViewBuilders(bubbleService));
             var bubbleMoverDispatcher = new BubbleMoverDispatcher();
@@ -38,17 +42,25 @@ namespace Code
             
             updateBehavior.AddToUpdate(_userInput);
             updateBehavior.AddToUpdate(bubbleMoverDispatcher);
-            
+
             var map = new Map(_mainCamera);
             map.Construct(new Vector2(_bubbleDiameter, _bubbleDiameter));
+            
+            var bubbleBuilder = new BubbleBuilder(viewModelDispatcher)
+            {
+                Diameter = _bubbleDiameter
+            };
+            var bubbleExploder = new BubbleExploder(map, bubbleMoverDispatcher);
+
+            var level = new Level(levelService, map, bubbleBuilder, bubbleMoverDispatcher, bubbleExploder);
+            level.Construct(_level);
 
             _debugBubbleWayBuilder = new BubbleWayBuilder(map, 4);
 
-            var bubbleShooter = new BubbleShooter(map, _userInput, bubbleMoverDispatcher, viewModelDispatcher)
+            var bubbleShooter = new BubbleShooter(map, _userInput, bubbleMoverDispatcher, bubbleBuilder, bubbleExploder)
             {
                 Position = _bubbleShooterSpawner.position,
-                BubbleMoveSpeed = _bubbleSpeed,
-                BubbleDiameter = _bubbleDiameter
+                BubbleMoveSpeed = _bubbleSpeed
             };
             
             bubbleShooter.Charge();

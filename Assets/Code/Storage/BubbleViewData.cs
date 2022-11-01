@@ -3,8 +3,8 @@ using UnityEngine;
 
 namespace Code.Storage
 {
-    [CreateAssetMenu(menuName = "Game/" + nameof(StorableBubbleView), fileName = nameof(StorableBubbleView))]
-    public class StorableBubbleView : ScriptableObject
+    [CreateAssetMenu(menuName = "Game/" + nameof(BubbleViewData), fileName = nameof(BubbleViewData))]
+    public class BubbleViewData : ScriptableObject
     {
         [SerializeField] private BubbleType _bubbleType;
         [SerializeField] private Sprite _sprite;

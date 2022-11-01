@@ -12,6 +12,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2e8c4caf41294a23be97049403ba8c40, type: 3}
   m_Name: BlueBubble
   m_EditorClassIdentifier: 
-  _bubbleType: 1
+  _bubbleType: 2
   _sprite: {fileID: 21300000, guid: 26926f27018670141b578ec6da34c1b3, type: 3}
   _color: {r: 0, g: 0.10835743, b: 1, a: 1}

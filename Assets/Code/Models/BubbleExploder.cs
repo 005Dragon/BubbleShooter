@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Code.Common;
@@ -8,8 +9,10 @@ namespace Code.Models
 {
     public class BubbleExploder
     {
+        public event EventHandler ExplosionFinished;
+        
         public int MinChainLength { get; set; } = 3;
-        public float ExplosionForce { get; set; } = 1.0f;
+        public float ExplosionForce { get; set; } = 2.0f;
         
         private readonly Map _map;
         private readonly BubbleMoverDispatcher _bubbleMoverDispatcher;
@@ -50,6 +53,7 @@ namespace Code.Models
                     Explosion(detachedBubble, bubble.Position);
                 }
 
+                ExplosionFinished?.Invoke(this, EventArgs.Empty);
                 return true;
             }
 

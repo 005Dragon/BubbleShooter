@@ -505,10 +505,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _mainCamera: {fileID: 519420031}
+  _level: 1
   _bubbleShooterSpawner: {fileID: 1008262995}
   _bubbleSpeed: 20
   _bubbleDiameter: 0.5
   _bubbleViewStorage: {fileID: 11400000, guid: cda3d6ac5ff9dd6449e35fa48d894988, type: 2}
+  _levelStorage: {fileID: 11400000, guid: b91b6b1cd08a93b40ad1c47bc193a518, type: 2}
 --- !u!114 &1152379430
 MonoBehaviour:
   m_ObjectHideFlags: 0

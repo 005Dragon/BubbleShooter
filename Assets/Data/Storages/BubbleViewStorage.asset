@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e7e13a7c711f4173b3a6c3cd29c169cb, type: 3}
   m_Name: BubbleViewStorage
   m_EditorClassIdentifier: 
-  _snakeSprites:
+  _bubbleViews:
   - {fileID: 11400000, guid: 61315f9761f75ef4cb56ac4fe9e4e7a3, type: 2}
   - {fileID: 11400000, guid: c627b3ab8333e874b8bf18dd2956beb1, type: 2}
   - {fileID: 11400000, guid: 8da696976204dab49b73e633990181d4, type: 2}
