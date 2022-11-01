@@ -52,6 +52,8 @@ namespace Code
             };
             
             bubbleShooter.Charge();
+            
+            new GameOverBuilder(map, viewModelDispatcher, x => updateBehavior.StopUpdate = x).Build();
         }
 
         // TODO delete after debug.
@@ -79,9 +81,12 @@ namespace Code
 
         private IViewBuilder[] GetViewBuilders(BubbleService bubbleService)
         {
+            Transform cachedTransform = transform;
+            
             return new IViewBuilder[]
             {
-                new BubbleViewBuilder(transform, bubbleService)
+                new BubbleViewBuilder(cachedTransform, bubbleService),
+                new GameOverViewBuilder(cachedTransform, FindObjectOfType<GameOverView>)
             };
         }
     }

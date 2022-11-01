@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Code.Common;
@@ -7,6 +8,8 @@ namespace Code.Models
 {
     public class Map
     {
+        public event EventHandler FullnessChanged;
+        
         public IReadOnlyCollection<BorderLine> BorderLines => _borderLines;
 
         public IEnumerable<Vector2Int> GridPositions => 
@@ -20,7 +23,7 @@ namespace Code.Models
         public Bubble this[Vector2Int gridPosition]
         {
             get => _grid[gridPosition.x + gridPosition.y * GridSize.x];
-            set => _grid[gridPosition.x + gridPosition.y * GridSize.x] = value;
+            private set => _grid[gridPosition.x + gridPosition.y * GridSize.x] = value;
         }
         
         public Vector2Int GridSize { get; private set; }
@@ -80,6 +83,8 @@ namespace Code.Models
             {
                 bubble.Position = _gridPositionToWorldPositionIndex[gridPosition];
             }
+            
+            FullnessChanged?.Invoke(this, EventArgs.Empty);
         }
 
         public Bubble Detach(Vector2Int gridPosition)
@@ -88,6 +93,8 @@ namespace Code.Models
             
             this[gridPosition] = null;
 
+            FullnessChanged?.Invoke(this, EventArgs.Empty);
+            
             return detachedBubble;
         }
 

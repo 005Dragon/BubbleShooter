@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using Code.Builders;
-using Code.Common;
 using Code.Movers;
+using Code.Services;
 using Code.Views;
 using UnityEngine;
 
@@ -46,7 +46,7 @@ namespace Code.Models
 
         public void Charge()
         {
-            _readyBubble = _bubbleBuilder.Build(BubbleType.Green, Position);
+            _readyBubble = _bubbleBuilder.Build(BubbleService.GetRandomType(), Position);
         }
 
         private void UserInputOnShot(object sender, Vector2 targetPosition)
