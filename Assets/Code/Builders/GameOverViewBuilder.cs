@@ -14,16 +14,7 @@ namespace Code.Builders
             _getGameOverView = getGameOverView;
         }
 
-        protected override GameOverView CreateView(GameObject gameObject, GameOver model)
-        {
-            var view = gameObject.AddComponent<GameOverView>();
-
-            view.Model = model;
-
-            return view;
-        }
-
-        protected override bool TryGetViewFromPool(GameOver model, out GameOverView view)
+        protected override bool TryGetExistingView(GameOver model, out GameOverView view)
         {
             view = _getGameOverView();
 

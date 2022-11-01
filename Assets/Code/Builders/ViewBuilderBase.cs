@@ -27,7 +27,7 @@ namespace Code.Builders
 
             var typedModel = (TModel)model;
 
-            if (!TryGetViewFromPool(typedModel, out TView view))
+            if (!TryGetExistingView(typedModel, out TView view))
             {
                 var gameObject = new GameObject();
                 gameObject.transform.SetParent(_root);
@@ -40,9 +40,15 @@ namespace Code.Builders
             return view;
         }
 
-        protected abstract TView CreateView(GameObject gameObject, TModel model);
+        protected virtual TView CreateView(GameObject gameObject, TModel model)
+        {
+            var view = gameObject.AddComponent<TView>();
+            view.Model = model;
 
-        protected virtual bool TryGetViewFromPool(TModel model, out TView view)
+            return view;
+        }
+
+        protected virtual bool TryGetExistingView(TModel model, out TView view)
         {
             view = default;
             return false;

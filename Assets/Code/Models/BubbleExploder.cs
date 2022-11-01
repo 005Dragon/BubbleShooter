@@ -9,7 +9,7 @@ namespace Code.Models
 {
     public class BubbleExploder
     {
-        public event EventHandler ExplosionFinished;
+        public event EventHandler<bool> ExplosionFinished;
         
         public int MinChainLength { get; set; } = 3;
         public float ExplosionForce { get; set; } = 2.0f;
@@ -29,6 +29,7 @@ namespace Code.Models
 
             if (!_map.TryGetGridPosition(bubble, out Vector2Int gridPosition))
             {
+                ExplosionFinished?.Invoke(this, false);
                 return false;
             }
             
@@ -53,10 +54,11 @@ namespace Code.Models
                     Explosion(detachedBubble, bubble.Position);
                 }
 
-                ExplosionFinished?.Invoke(this, EventArgs.Empty);
+                ExplosionFinished?.Invoke(this, true);
                 return true;
             }
 
+            ExplosionFinished?.Invoke(this, false);
             return false;
         }
 

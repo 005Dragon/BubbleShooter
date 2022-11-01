@@ -45,9 +45,9 @@ namespace Code.Models
             NextStage();
         }
         
-        private void BubbleExploderOnExplosionFinished(object sender, EventArgs eventArgs)
+        private void BubbleExploderOnExplosionFinished(object sender, bool hasExplosion)
         {
-            if (!_map.EmployedPositions.Any())
+            if (hasExplosion && !_map.EmployedPositions.Any())
             {
                 NextStage();
             }

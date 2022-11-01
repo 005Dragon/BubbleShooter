@@ -21,6 +21,7 @@ namespace Code
         [SerializeField] private Transform _bubbleShooterSpawner;
         [SerializeField] private float _bubbleSpeed;
         [SerializeField] private float _bubbleDiameter;
+        [SerializeField] private float _bubbleMinYPositionToGameOver;
 
         [Header("Storages")] 
         [SerializeField] private BubbleViewStorage _bubbleViewStorage;
@@ -65,7 +66,11 @@ namespace Code
             
             bubbleShooter.Charge();
             
-            new GameOverBuilder(map, viewModelDispatcher, x => updateBehavior.StopUpdate = x).Build();
+            GameOver gameOver = 
+                new GameOverBuilder(map, bubbleExploder, viewModelDispatcher, x => updateBehavior.StopUpdate = x)
+                    .Build();
+
+            gameOver.MinBubblePositionToActive = _bubbleMinYPositionToGameOver;
         }
 
         // TODO delete after debug.
@@ -98,7 +103,8 @@ namespace Code
             return new IViewBuilder[]
             {
                 new BubbleViewBuilder(cachedTransform, bubbleService),
-                new GameOverViewBuilder(cachedTransform, FindObjectOfType<GameOverView>)
+                new GameOverViewBuilder(cachedTransform, FindObjectOfType<GameOverView>),
+                new GameOverMinHeightLineViewBuilder(cachedTransform, FindObjectOfType<GameOverMinHeightLineView>)
             };
         }
     }

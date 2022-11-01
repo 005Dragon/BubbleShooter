@@ -20,9 +20,8 @@ namespace Code.Builders
 
         protected override BubbleView CreateView(GameObject gameObject, Bubble model)
         {
-            var bubbleView = gameObject.AddComponent<BubbleView>();
+            var bubbleView = base.CreateView(gameObject, model);
             
-            bubbleView.Model = model;
             bubbleView.Sprite = _bubbleService.GetSprite(model.BubbleType);
             bubbleView.Color = _bubbleService.GetColor(model.BubbleType);
 
@@ -32,7 +31,7 @@ namespace Code.Builders
             return bubbleView;
         }
 
-        protected override bool TryGetViewFromPool(Bubble model, out BubbleView view)
+        protected override bool TryGetExistingView(Bubble model, out BubbleView view)
         {
             if (_bubbleTypeToBubbleViewsIndex.TryGetValue(model.BubbleType, out List<BubbleView> bubbleViews))
             {
