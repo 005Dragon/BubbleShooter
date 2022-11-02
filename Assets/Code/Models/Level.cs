@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using Code.Builders;
@@ -11,6 +10,8 @@ namespace Code.Models
 {
     public class Level
     {
+        public bool LevelFinished => _levelQueue.Count == 0;
+        
         public float BubbleMoveSpeed { get; set; } = 20;
         public int LevelHeight { get; set; } = 20;
         public int StageRowCount { get; set; } = 8;

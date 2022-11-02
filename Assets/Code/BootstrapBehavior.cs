@@ -69,6 +69,8 @@ namespace Code
                     .Build();
 
             gameOver.MinBubblePositionToActive = _bubbleMinYPositionToGameOver;
+
+            new GameVictoryBuilder(map, level, x => updateBehavior.StopUpdate = x, viewModelDispatcher).Build();
         }
 
         private IViewBuilder[] GetViewBuilders(BubbleService bubbleService)
@@ -80,7 +82,8 @@ namespace Code
                 new BubbleViewBuilder(cachedTransform, bubbleService),
                 new GameOverViewBuilder(cachedTransform, FindObjectOfType<GameOverView>),
                 new GameOverMinHeightLineViewBuilder(cachedTransform, FindObjectOfType<GameOverMinHeightLineView>),
-                new BubbleShooterAimViewBuilder(cachedTransform, FindObjectOfType<BubbleShooterAimView>)
+                new BubbleShooterAimViewBuilder(cachedTransform, FindObjectOfType<BubbleShooterAimView>),
+                new GameVictoryViewBuilder(cachedTransform, FindObjectOfType<GameVictoryView>)
             };
         }
     }
