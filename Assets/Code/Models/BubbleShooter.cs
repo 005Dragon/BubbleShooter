@@ -10,7 +10,6 @@ namespace Code.Models
     {
         public Vector2 Position { get; set; }
         public float BubbleMoveSpeed { get; set; } = 1.0f;
-        public int BubbleMaxIntersections { get; set; } = 20;
         public float MaxAngle { get; set; } = 70.0f;
         
         private readonly BubbleBuilder _bubbleBuilder;
@@ -34,7 +33,7 @@ namespace Code.Models
             _bubbleMoverDispatcher = bubbleMoverDispatcher;
 
             _bubbleBuilder = bubbleBuilder;
-            _bubbleWayBuilder = new BubbleWayBuilder(map, BubbleMaxIntersections);
+            _bubbleWayBuilder = new BubbleWayBuilder(map, 100);
             _bubbleExploder = bubbleExploder;
 
             userInput.Shot += UserInputOnShot;
@@ -60,7 +59,7 @@ namespace Code.Models
                 return;
             }
 
-            List<Vector2> bubbleWay =_bubbleWayBuilder.Build(Position, direction);
+            List<Vector2> bubbleWay = _bubbleWayBuilder.Build(Position, direction);
             
             var bubbleMover = new BubbleMover(_readyBubble, BubbleMoveSpeed, bubbleWay.ToArray());
             _bubbleMoverDispatcher.Register(_readyBubble, bubbleMover);

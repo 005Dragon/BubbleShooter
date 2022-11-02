@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using Code.Builders;
 using Code.Common;
 using Code.Models;
@@ -27,9 +26,6 @@ namespace Code
         [SerializeField] private BubbleViewStorage _bubbleViewStorage;
         [SerializeField] private LevelStorage _levelStorage;
 
-        private UserInput _userInput;
-        private BubbleWayBuilder _debugBubbleWayBuilder;
-
         private void Awake()
         {
             var updateBehavior = GetComponent<UpdateBehavior>();
@@ -39,9 +35,9 @@ namespace Code
 
             var viewModelDispatcher = new ViewModelDispatcher(GetViewBuilders(bubbleService));
             var bubbleMoverDispatcher = new BubbleMoverDispatcher();
-            _userInput = new UserInput(_mainCamera);
+            var userInput = new UserInput(_mainCamera);
             
-            updateBehavior.AddToUpdate(_userInput);
+            updateBehavior.AddToUpdate(userInput);
             updateBehavior.AddToUpdate(bubbleMoverDispatcher);
 
             var map = new Map(_mainCamera);
@@ -56,11 +52,13 @@ namespace Code
             var level = new Level(levelService, map, bubbleBuilder, bubbleMoverDispatcher, bubbleExploder);
             level.Construct(_level);
 
-            _debugBubbleWayBuilder = new BubbleWayBuilder(map, 4);
+            Vector2 bubbleShooterPosition = _bubbleShooterSpawner.position;
+            new BubbleShooterAimBuilder(viewModelDispatcher, map, userInput, updateBehavior.AddToUpdate)
+                .Build(bubbleShooterPosition, 3);
 
-            var bubbleShooter = new BubbleShooter(map, _userInput, bubbleMoverDispatcher, bubbleBuilder, bubbleExploder)
+            var bubbleShooter = new BubbleShooter(map, userInput, bubbleMoverDispatcher, bubbleBuilder, bubbleExploder)
             {
-                Position = _bubbleShooterSpawner.position,
+                Position = bubbleShooterPosition,
                 BubbleMoveSpeed = _bubbleSpeed
             };
             
@@ -73,29 +71,6 @@ namespace Code
             gameOver.MinBubblePositionToActive = _bubbleMinYPositionToGameOver;
         }
 
-        // TODO delete after debug.
-        private void Update()
-        {
-            if (_userInput.Aiming)
-            {
-                Vector2 direction = 
-                    (_userInput.GetTargetPosition() - (Vector2)_bubbleShooterSpawner.position).normalized;
-            
-                List<Vector2> points =
-                    _debugBubbleWayBuilder.Build(_bubbleShooterSpawner.position, direction);
-
-                Vector2 lastPoint = _bubbleShooterSpawner.position;
-
-                foreach (Vector2 point in points)
-                {
-                    Debug.DrawLine(lastPoint, point, Color.black);
-                    lastPoint = point;
-                }
-            }
-
-            Debug.DrawLine(_bubbleShooterSpawner.position, _userInput.GetTargetPosition(), Color.red);
-        }
-
         private IViewBuilder[] GetViewBuilders(BubbleService bubbleService)
         {
             Transform cachedTransform = transform;
@@ -104,7 +79,8 @@ namespace Code
             {
                 new BubbleViewBuilder(cachedTransform, bubbleService),
                 new GameOverViewBuilder(cachedTransform, FindObjectOfType<GameOverView>),
-                new GameOverMinHeightLineViewBuilder(cachedTransform, FindObjectOfType<GameOverMinHeightLineView>)
+                new GameOverMinHeightLineViewBuilder(cachedTransform, FindObjectOfType<GameOverMinHeightLineView>),
+                new BubbleShooterAimViewBuilder(cachedTransform, FindObjectOfType<BubbleShooterAimView>)
             };
         }
     }
