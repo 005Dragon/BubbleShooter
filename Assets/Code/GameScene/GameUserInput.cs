@@ -7,6 +7,7 @@ namespace Code.GameScene
     public class GameUserInput : IUpdatable
     {
         public event EventHandler<Vector2> Shot;
+        public event EventHandler Pause;
         
         public bool Aiming { get; private set; }
         
@@ -19,6 +20,11 @@ namespace Code.GameScene
 
         public bool Update()
         {
+            if (Input.GetKey(KeyCode.Escape))
+            {
+                Pause?.Invoke(this, EventArgs.Empty);
+            }
+            
             if (Input.GetMouseButtonDown(0))
             {
                 Aiming = true;

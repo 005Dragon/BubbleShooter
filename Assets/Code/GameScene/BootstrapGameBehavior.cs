@@ -73,6 +73,8 @@ namespace Code.GameScene
 
             new GameVictoryBuilder(map, level, x => updateBehavior.StopUpdate = x, viewModelDispatcher, sceneService)
                 .Build();
+
+            new PauseBuilder(userInput, x => updateBehavior.StopUpdate = x, viewModelDispatcher, sceneService).Build();
         }
 
         private IViewBuilder[] GetViewBuilders(BubbleService bubbleService)
@@ -84,6 +86,7 @@ namespace Code.GameScene
                 new BubbleViewBuilder(cachedTransform, bubbleService),
                 new ExistsViewBuilder<GameOver, GameOverView>(cachedTransform, FindObjectOfType<GameOverView>),
                 new ExistsViewBuilder<GameVictory, GameVictoryView>(cachedTransform, FindObjectOfType<GameVictoryView>),
+                new ExistsViewBuilder<Pause, PauseView>(cachedTransform, FindObjectOfType<PauseView>),
                 new ExistsViewBuilder<BubbleShooterAim, BubbleShooterAimView>(
                     cachedTransform,
                     FindObjectOfType<BubbleShooterAimView>
@@ -108,6 +111,16 @@ namespace Code.GameScene
                 (
                     cachedTransform,
                     FindObjectOfType<GameVictoryMainMenuNavigationPointView>
+                ),
+
+                new ExistsViewBuilder<PauseStartGameNavigationPoint, PauseStartGameNavigationPointView>(
+                    cachedTransform,
+                    FindObjectOfType<PauseStartGameNavigationPointView>
+                ),
+
+                new ExistsViewBuilder<PauseMainMenuNavigationPoint, PauseMainMenuNavigationPointView>(
+                    cachedTransform,
+                    FindObjectOfType<PauseMainMenuNavigationPointView>
                 )
             };
         }
