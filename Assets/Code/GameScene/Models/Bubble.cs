@@ -1,5 +1,5 @@
 using System;
-using Code.GameScene.Common;
+using Code.Common;
 using UnityEngine;
 
 namespace Code.GameScene.Models

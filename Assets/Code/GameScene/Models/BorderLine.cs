@@ -1,4 +1,4 @@
-using Code.GameScene.Common;
+using Code.Common;
 
 namespace Code.GameScene.Models
 {

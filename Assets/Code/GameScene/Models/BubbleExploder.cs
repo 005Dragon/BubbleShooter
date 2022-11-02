@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Code.GameScene.Common;
+using Code.Common;
 using Code.GameScene.Movers;
 using UnityEngine;
 

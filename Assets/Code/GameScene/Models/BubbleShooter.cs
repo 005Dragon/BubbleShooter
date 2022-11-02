@@ -1,7 +1,7 @@
 using System.Collections.Generic;
-using Code.GameScene.Builders;
+using Code.GameScene.Models.Builders;
 using Code.GameScene.Movers;
-using Code.GameScene.Services;
+using Code.Services;
 using UnityEngine;
 
 namespace Code.GameScene.Models
@@ -24,7 +24,7 @@ namespace Code.GameScene.Models
 
         public BubbleShooter(
             Map map,
-            UserInput userInput,
+            GameUserInput gameUserInput,
             BubbleMoverDispatcher bubbleMoverDispatcher,
             BubbleBuilder bubbleBuilder,
             BubbleExploder bubbleExploder)
@@ -36,7 +36,7 @@ namespace Code.GameScene.Models
             _bubbleWayBuilder = new BubbleWayBuilder(map, 100);
             _bubbleExploder = bubbleExploder;
 
-            userInput.Shot += UserInputOnShot;
+            gameUserInput.Shot += UserInputOnShot;
         }
 
         public void Charge()

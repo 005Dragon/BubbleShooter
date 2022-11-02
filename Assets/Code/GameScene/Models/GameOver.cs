@@ -1,6 +1,6 @@
 using System;
 using System.Linq;
-using UnityEngine.SceneManagement;
+using Code.Common;
 
 namespace Code.GameScene.Models
 {
@@ -53,11 +53,6 @@ namespace Code.GameScene.Models
                     SetActive(true);
                 }
             }
-        }
-
-        public void ReloadScene()
-        {
-            SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
         }
 
         private void SetActive(bool active)

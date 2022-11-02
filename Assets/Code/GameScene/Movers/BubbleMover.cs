@@ -1,6 +1,6 @@
 using System;
 using System.Collections.Generic;
-using Code.GameScene.Common;
+using Code.Common;
 using Code.GameScene.Models;
 using UnityEngine;
 

@@ -1,9 +1,9 @@
 using System.Collections.Generic;
 using System.Linq;
-using Code.GameScene.Builders;
-using Code.GameScene.Common;
+using Code.Common;
+using Code.GameScene.Models.Builders;
 using Code.GameScene.Movers;
-using Code.GameScene.Services;
+using Code.Services;
 using UnityEngine;
 
 namespace Code.GameScene.Models
@@ -39,7 +39,7 @@ namespace Code.GameScene.Models
         }
         public void Construct(LevelKey levelKey)
         {
-            _levelQueue = levelKey == LevelKey.None
+            _levelQueue = levelKey == LevelKey.Random
                 ? _levelService.GetRandomLevelQueue(_map.GridSize.x, LevelHeight)
                 : _levelService.GetLevelQueue(levelKey);
 
