@@ -13,4 +13,4 @@ MonoBehaviour:
   m_Name: MainMenu
   m_EditorClassIdentifier: 
   _sceneKey: 0
-  _scene: {fileID: 102900000, guid: 41619f24fbed01945a730fcd742890e9, type: 3}
+  _sceneName: MainMenuScene

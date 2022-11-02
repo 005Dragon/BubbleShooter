@@ -22,6 +22,8 @@ namespace Code.GameScene
         [SerializeField] private LevelStorage _levelStorage;
         [SerializeField] private SceneStorage _sceneStorage;
 
+        private GameUserInput _userInput;
+        
         private void Awake()
         {
             var mainCamera = Camera.main;
@@ -33,9 +35,9 @@ namespace Code.GameScene
 
             var viewModelDispatcher = new ViewModelDispatcher(GetViewBuilders(bubbleService));
             var bubbleMoverDispatcher = new BubbleMoverDispatcher();
-            var userInput = new GameUserInput(mainCamera);
+            _userInput = new GameUserInput(mainCamera);
             
-            updateBehavior.AddToUpdate(userInput);
+            //updateBehavior.AddToUpdate(userInput);
             updateBehavior.AddToUpdate(bubbleMoverDispatcher);
 
             var map = new Map(mainCamera);
@@ -50,10 +52,10 @@ namespace Code.GameScene
             var level = new Level(levelService, map, bubbleBuilder, bubbleMoverDispatcher, bubbleExploder);
             level.Construct(_gameConfig.Level);
 
-            new BubbleShooterAimBuilder(viewModelDispatcher, map, userInput, updateBehavior.AddToUpdate)
+            new BubbleShooterAimBuilder(viewModelDispatcher, map, _userInput, updateBehavior.AddToUpdate)
                 .Build(_gameConfig.BubbleShooterPosition, 3);
 
-            var bubbleShooter = new BubbleShooter(map, userInput, bubbleMoverDispatcher, bubbleBuilder, bubbleExploder)
+            var bubbleShooter = new BubbleShooter(map, _userInput, bubbleMoverDispatcher, bubbleBuilder, bubbleExploder)
             {
                 Position = _gameConfig.BubbleShooterPosition,
                 BubbleMoveSpeed = _gameConfig.BubbleSpeed
@@ -74,8 +76,12 @@ namespace Code.GameScene
             new GameVictoryBuilder(map, level, x => updateBehavior.StopUpdate = x, viewModelDispatcher, sceneService)
                 .Build();
 
-            new PauseBuilder(userInput, x => updateBehavior.StopUpdate = x, viewModelDispatcher, sceneService).Build();
+            new PauseBuilder(_userInput, x => updateBehavior.StopUpdate = x, viewModelDispatcher, sceneService).Build();
         }
+
+        private void OnEnable() => _userInput.Enable();
+
+        private void OnDisable() => _userInput.Disable();
 
         private IViewBuilder[] GetViewBuilders(BubbleService bubbleService)
         {

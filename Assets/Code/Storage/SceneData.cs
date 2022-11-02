@@ -8,9 +8,9 @@ namespace Code.Storage
     public class SceneData : ScriptableObject
     {
         [SerializeField] private SceneKey _sceneKey;
-        [SerializeField] private SceneAsset _scene;
+        [SerializeField] private string _sceneName;
 
         public SceneKey SceneKey => _sceneKey;
-        public SceneAsset Scene => _scene;
+        public string SceneName => _sceneName;
     }
 }

@@ -1,10 +1,10 @@
 using System;
-using Code.Common;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 namespace Code.GameScene
 {
-    public class GameUserInput : IUpdatable
+    public class GameUserInput
     {
         public event EventHandler<Vector2> Shot;
         public event EventHandler Pause;
@@ -12,36 +12,53 @@ namespace Code.GameScene
         public bool Aiming { get; private set; }
         
         private readonly Camera _camera;
+        private readonly Controls _controls;
 
         public GameUserInput(Camera camera)
         {
             _camera = camera;
+
+            _controls = new Controls();
+            
+            _controls.Main.Pause.performed += PauseOnPerformed;
+            _controls.Main.Shot.performed += AimingOnPerformed;
+            _controls.Main.Shot.canceled += AimingOnCanceled; 
         }
 
-        public bool Update()
+        private void AimingOnPerformed(InputAction.CallbackContext obj)
         {
-            if (Input.GetKey(KeyCode.Escape))
-            {
-                Pause?.Invoke(this, EventArgs.Empty);
-            }
-            
-            if (Input.GetMouseButtonDown(0))
-            {
-                Aiming = true;
-            }
-            
-            if (Aiming && Input.GetMouseButtonUp(0))
-            {
-                Shot?.Invoke(this, GetTargetPosition());
-                Aiming = false;
-            }
-
-            return true;
+            Aiming = true;
         }
+
+        private void AimingOnCanceled(InputAction.CallbackContext obj)
+        {
+            Aiming = false;
+            Shot?.Invoke(this, GetTargetPosition());
+        }
+
+        private void PauseOnPerformed(InputAction.CallbackContext obj)
+        {
+            Pause?.Invoke(this, EventArgs.Empty);
+        }
+
+        public void Enable() => _controls.Enable();
+        public void Disable() => _controls.Disable();
 
         public Vector2 GetTargetPosition()
         {
-            return _camera.ScreenToWorldPoint(Input.mousePosition);
+            Vector2 targetPosition = default;
+            
+            if (Touchscreen.current != null)
+            {
+                targetPosition = Touchscreen.current.position.ReadValue();
+            }
+
+            if (Mouse.current != null)
+            {
+                targetPosition = Mouse.current.position.ReadValue();
+            }
+            
+            return _camera.ScreenToWorldPoint(targetPosition);
         }
     }
 }
