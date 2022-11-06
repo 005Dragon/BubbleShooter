@@ -103,9 +103,9 @@ namespace Code.GameScene
                     FindObjectOfType<GameOverMinHeightLineView>
                 ),
 
-                new ExistsViewBuilder<StartGameNavigationPoint, StartGameNavigationPointView>(
+                new ExistsViewBuilder<GameOverStartGameNavigationPoint, GameOverStartGameNavigationPointView>(
                     cachedTransform,
-                    FindObjectOfType<StartGameNavigationPointView>
+                    FindObjectOfType<GameOverStartGameNavigationPointView>
                 ),
 
                 new ExistsViewBuilder<GameOverMainMenuNavigationPoint, GameOverMainMenuNavigationPointView>(

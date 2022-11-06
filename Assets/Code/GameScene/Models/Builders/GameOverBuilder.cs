@@ -29,7 +29,9 @@ namespace Code.GameScene.Models.Builders
 
         public GameOver Build()
         {
-            var startGameNavigationPoint = new StartGameNavigationPoint(_sceneService.GetSceneName(SceneKey.Game));
+            var startGameNavigationPoint = 
+                new GameOverStartGameNavigationPoint(_sceneService.GetSceneName(SceneKey.Game));
+            
             var gameOverMinHeightLine = new GameOver.MinHeightLine();
             var gameOver = new GameOver(gameOverMinHeightLine, _map, _bubbleExploder, _stopUpdate);
             
