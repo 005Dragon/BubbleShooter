@@ -1,11 +1,5 @@
 using Code.Common;
-using Code.Common.Models;
-using Code.Common.Views;
 using Code.GameScene.Models;
-using Code.GameScene.Models.Builders;
-using Code.GameScene.Movers;
-using Code.GameScene.Views;
-using Code.GameScene.Views.Builders;
 using Code.Services;
 using Code.Storage;
 using UnityEngine;
@@ -15,120 +9,112 @@ namespace Code.GameScene
     [RequireComponent(typeof(UpdateBehavior))]
     public class BootstrapGameBehavior : MonoBehaviour
     {
-        [SerializeField] private GameConfigData _gameConfig;
+        [SerializeField] private StorageSet _storageSet;
 
-        [Header("Storages")] 
-        [SerializeField] private BubbleViewStorage _bubbleViewStorage;
-        [SerializeField] private LevelStorage _levelStorage;
-        [SerializeField] private SceneStorage _sceneStorage;
+        private GameUserInputService _userInputService;
 
-        private GameUserInput _userInput;
-        
         private void Awake()
         {
-            var mainCamera = Camera.main;
             var updateBehavior = GetComponent<UpdateBehavior>();
+
+            var gameServices = new GameServices(Camera.main, _storageSet, updateBehavior);
+            _userInputService = gameServices.UserInputService;
             
-            var bubbleService = new BubbleService(_bubbleViewStorage);
-            var levelService = new LevelService(_levelStorage);
-            var sceneService = new SceneService(_sceneStorage);
-
-            var viewModelDispatcher = new ViewModelDispatcher(GetViewBuilders(bubbleService));
-            var bubbleMoverDispatcher = new BubbleMoverDispatcher();
-            _userInput = new GameUserInput(mainCamera);
+            Map map = CreateMap(gameServices);
+            Level level = CreateLevel(map, gameServices);
             
-            //updateBehavior.AddToUpdate(userInput);
-            updateBehavior.AddToUpdate(bubbleMoverDispatcher);
-
-            var map = new Map(mainCamera);
-            map.Construct(new Vector2(_gameConfig.BubbleDiameter, _gameConfig.BubbleDiameter));
+            CreateAim(map, gameServices);
+            CreateBubbleShooter(map, level, gameServices);
             
-            var bubbleBuilder = new BubbleBuilder(viewModelDispatcher)
-            {
-                Diameter = _gameConfig.BubbleDiameter
-            };
-            var bubbleExploder = new BubbleExploder(map, bubbleMoverDispatcher);
-
-            var level = new Level(levelService, map, bubbleBuilder, bubbleMoverDispatcher, bubbleExploder);
-            level.Construct(_gameConfig.Level);
-
-            new BubbleShooterAimBuilder(viewModelDispatcher, map, _userInput, updateBehavior.AddToUpdate)
-                .Build(_gameConfig.BubbleShooterPosition, 3);
-
-            var bubbleShooter = new BubbleShooter(map, _userInput, bubbleMoverDispatcher, bubbleBuilder, bubbleExploder)
-            {
-                Position = _gameConfig.BubbleShooterPosition,
-                BubbleMoveSpeed = _gameConfig.BubbleSpeed
-            };
-            
-            bubbleShooter.Charge();
-
-            GameOver gameOver = new GameOverBuilder(
-                    map,
-                    bubbleExploder,
-                    viewModelDispatcher,
-                    x => updateBehavior.StopUpdate = x,
-                    sceneService)
-                .Build();
-
-            gameOver.MinBubblePositionToActive = _gameConfig.BubbleMinYPositionToGameOver;
-
-            new GameVictoryBuilder(map, level, x => updateBehavior.StopUpdate = x, viewModelDispatcher, sceneService)
-                .Build();
-
-            new PauseBuilder(_userInput, x => updateBehavior.StopUpdate = x, viewModelDispatcher, sceneService).Build();
+            CreateGameStates(map, level, gameServices);
         }
 
-        private void OnEnable() => _userInput.Enable();
+        private void OnEnable() => _userInputService.Enable();
 
-        private void OnDisable() => _userInput.Disable();
+        private void OnDisable() => _userInputService.Disable();
 
-        private IViewBuilder[] GetViewBuilders(BubbleService bubbleService)
+        private Map CreateMap(GameServices gameServices)
         {
-            Transform cachedTransform = transform;
+            var map = new Map(gameServices);
 
-            return new IViewBuilder[]
+            float bubbleDiameter = gameServices.GameConfigService.BubbleDiameter;
+
+            map.Construct(new Vector2(bubbleDiameter, bubbleDiameter));
+
+            return map;
+        }
+
+        private Level CreateLevel(Map map, GameServices gameServices)
+        {
+            var level = new Level(map, gameServices);
+            
+            level.Construct(gameServices.GameConfigService.Level);
+
+            return level;
+        }
+        
+        private void CreateAim(Map map, GameServices gameServices)
+        {
+            var bubbleShooterAim = new BubbleShooterAim(
+                new BubbleShooterAim.Settings
+                {
+                    Position = gameServices.GameConfigService.BubbleShooterPosition,
+                    Map = map,
+                    MaxIntersections = gameServices.GameConfigService.AimMaxIntersections,
+                    UserInputService = gameServices.UserInputService
+                }
+            );
+            
+            gameServices.ViewModelService.ConstructViewModel(bubbleShooterAim);
+            gameServices.UpdateService.AddToUpdate(bubbleShooterAim);
+        }
+
+        private void CreateBubbleShooter(Map map, Level level, GameServices gameServices)
+        {
+            var bubbleShooter = new BubbleShooter(map, level, gameServices)
             {
-                new BubbleViewBuilder(cachedTransform, bubbleService),
-                new ExistsViewBuilder<GameOver, GameOverView>(cachedTransform, FindObjectOfType<GameOverView>),
-                new ExistsViewBuilder<GameVictory, GameVictoryView>(cachedTransform, FindObjectOfType<GameVictoryView>),
-                new ExistsViewBuilder<Pause, PauseView>(cachedTransform, FindObjectOfType<PauseView>),
-                new ExistsViewBuilder<BubbleShooterAim, BubbleShooterAimView>(
-                    cachedTransform,
-                    FindObjectOfType<BubbleShooterAimView>
-                ),
-
-                new ExistsViewBuilder<GameOver.MinHeightLine, GameOverMinHeightLineView>(
-                    cachedTransform,
-                    FindObjectOfType<GameOverMinHeightLineView>
-                ),
-
-                new ExistsViewBuilder<GameOverStartGameNavigationPoint, GameOverStartGameNavigationPointView>(
-                    cachedTransform,
-                    FindObjectOfType<GameOverStartGameNavigationPointView>
-                ),
-
-                new ExistsViewBuilder<GameOverMainMenuNavigationPoint, GameOverMainMenuNavigationPointView>(
-                    cachedTransform,
-                    FindObjectOfType<GameOverMainMenuNavigationPointView>
-                ),
-
-                new ExistsViewBuilder<GameVictoryMainMenuNavigationPoint, GameVictoryMainMenuNavigationPointView>
-                (
-                    cachedTransform,
-                    FindObjectOfType<GameVictoryMainMenuNavigationPointView>
-                ),
-
-                new ExistsViewBuilder<PauseStartGameNavigationPoint, PauseStartGameNavigationPointView>(
-                    cachedTransform,
-                    FindObjectOfType<PauseStartGameNavigationPointView>
-                ),
-
-                new ExistsViewBuilder<PauseMainMenuNavigationPoint, PauseMainMenuNavigationPointView>(
-                    cachedTransform,
-                    FindObjectOfType<PauseMainMenuNavigationPointView>
-                )
+                Position = gameServices.GameConfigService.BubbleShooterPosition,
+                BubbleMoveSpeed = gameServices.GameConfigService.BubbleSpeed
             };
+
+            bubbleShooter.Charge();
+        }
+
+        private void CreateGameStates(Map map, Level level, GameServices gameServices)
+        {
+            var gameOverState = new GameOverGameState(
+                new GameOverGameState.Settings
+                {
+                    Map = map,
+                    BubbleExploder = level.BubbleExploder,
+                    MinBubblePositionToActive = gameServices.GameConfigService.BubbleMinYPositionToGameOver,
+                    UserInputService = gameServices.UserInputService,
+                    SceneService = gameServices.SceneService
+                }
+            );
+
+            var gameVictoryGameState = new GameVictoryGameState(
+                new GameVictoryGameState.Settings
+                {
+                    Map = map,
+                    Level = level,
+                    UserInputService = gameServices.UserInputService,
+                    SceneService = gameServices.SceneService
+                }
+            );
+
+            var pauseGameState = new PauseGameState(
+                new PauseGameState.Settings
+                {
+                    UserInputService = gameServices.UserInputService,
+                    UpdateService = gameServices.UpdateService,
+                    SceneService = gameServices.SceneService
+                }
+            );
+
+            gameServices.ViewModelService.ConstructViewModel(gameOverState);
+            gameServices.ViewModelService.ConstructViewModel(gameVictoryGameState);
+            gameServices.ViewModelService.ConstructViewModel(pauseGameState);
         }
     }
 }

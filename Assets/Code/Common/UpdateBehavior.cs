@@ -1,9 +1,10 @@
 using System.Collections.Generic;
+using Code.Services;
 using UnityEngine;
 
 namespace Code.Common
 {
-    public class UpdateBehavior : MonoBehaviour
+    public class UpdateBehavior : MonoBehaviour, IUpdateService
     {
         public bool StopUpdate { get; set; }
         

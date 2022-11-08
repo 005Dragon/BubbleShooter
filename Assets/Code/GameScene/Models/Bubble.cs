@@ -1,40 +1,26 @@
-using System;
 using Code.Common;
+using Code.Infrastructure.Models;
 using UnityEngine;
 
 namespace Code.GameScene.Models
 {
-    public class Bubble : IModel
+    public class Bubble : ModelBase<Bubble.Settings>
     {
-        public event EventHandler<Vector2> PositionChanged;
-        public event EventHandler Destroyed;
-        
-        public BubbleType BubbleType { get; }
-
-        public Vector2 Position
+        public class Settings : ModelSettingsBase
         {
-            get => _position;
-            set
+            public BubbleType BubbleType { get; set; }
+
+            public float Diameter
             {
-                _position = value;
-                PositionChanged?.Invoke(this, _position);
+                get => Scale.x;
+                set => Scale = new Vector2(value, value);
             }
         }
-
-        public float Diameter { get; }
         
-        private Vector2 _position;
+        public BubbleType BubbleType => _settings.BubbleType;
 
-        public Bubble(BubbleType bubbleType, Vector2 position, float diameter)
+        public Bubble(Settings settings) : base(settings)
         {
-            BubbleType = bubbleType;
-            Position = position;
-            Diameter = diameter;
-        }
-
-        public void Destroy()
-        {
-            Destroyed?.Invoke(this, EventArgs.Empty);
         }
     }
 }

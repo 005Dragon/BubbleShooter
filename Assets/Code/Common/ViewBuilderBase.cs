@@ -1,4 +1,6 @@
 using System;
+using Code.Infrastructure.Models;
+using Code.Infrastructure.Views;
 using UnityEngine;
 
 namespace Code.Common
@@ -8,15 +10,8 @@ namespace Code.Common
         where TView : MonoBehaviour, IView
     {
         public Type ModelType => typeof(TModel);
-        
-        private readonly Transform _root;
 
-        protected ViewBuilderBase(Transform root)
-        {
-            _root = root;
-        }
-
-        public IView Build(IModel model)
+        public void Build(IModel model)
         {
             if (model.GetType() != ModelType)
             {
@@ -28,21 +23,15 @@ namespace Code.Common
             if (!TryGetExistingView(typedModel, out TView view))
             {
                 var gameObject = new GameObject();
-                gameObject.transform.SetParent(_root);
-
                 view = CreateView(gameObject, typedModel);
             }
             
-            view.Initialize();
-
-            return view;
+            view.Initialize(model);
         }
 
         protected virtual TView CreateView(GameObject gameObject, TModel model)
         {
             var view = gameObject.AddComponent<TView>();
-            view.Model = model;
-
             return view;
         }
 

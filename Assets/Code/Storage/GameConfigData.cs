@@ -11,5 +11,6 @@ namespace Code.Storage
         public float BubbleSpeed;
         public float BubbleDiameter;
         public float BubbleMinYPositionToGameOver;
+        public int AimMaxIntersections;
     }
 }

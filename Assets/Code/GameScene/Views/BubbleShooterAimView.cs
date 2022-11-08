@@ -1,32 +1,38 @@
 using System;
 using System.Linq;
-using Code.Common;
 using Code.GameScene.Models;
+using Code.Infrastructure.Models;
+using Code.Infrastructure.Views;
 using UnityEngine;
 
 namespace Code.GameScene.Views
 {
     [RequireComponent(typeof(LineRenderer))]
-    public class BubbleShooterAimView : MonoBehaviour, IView
+    public class BubbleShooterAimView : ViewBase<BubbleShooterAim>
     {
-        public IModel Model { get; set; }
-
-        private BubbleShooterAim _model;
         private LineRenderer _lineRenderer;
         
-        public void Initialize()
+        public override void Initialize(IModel model)
         {
-            _model = (BubbleShooterAim)Model;
+            base.Initialize(model);
+
             _lineRenderer = GetComponent<LineRenderer>();
             
-            _model.Updated += ModelOnUpdated;
+            Model.Updated += ModelOnUpdated;
         }
 
         private void ModelOnUpdated(object sender, EventArgs eventArgs)
         {
-            _lineRenderer.enabled = _model.Aiming;
-            _lineRenderer.positionCount = _model.Points.Count;
-            _lineRenderer.SetPositions(_model.Points.Select(x => (Vector3)x).ToArray());
+            _lineRenderer.enabled = Model.Aiming;
+            _lineRenderer.positionCount = Model.Points.Count;
+            _lineRenderer.SetPositions(Model.Points.Select(x => (Vector3)x).ToArray());
+        }
+
+        protected override void FreeView()
+        {
+            Model.Updated -= ModelOnUpdated;
+            
+            base.FreeView();
         }
     }
 }

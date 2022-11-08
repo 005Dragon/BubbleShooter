@@ -1,26 +1,22 @@
 using Code.Common;
-using UnityEngine;
+using Code.Infrastructure.Models;
 
 namespace Code.GameScene.Models.Builders
 {
-    public class BubbleBuilder
+    public class BubbleBuilder : ModelBuilderBase<Bubble, Bubble.Settings>
     {
-        public float Diameter { get; set; } = 1.0f;
-        
-        private readonly ViewModelDispatcher _viewModelDispatcher;
+        public float Diameter { get; set; }
 
-        public BubbleBuilder(ViewModelDispatcher viewModelDispatcher)
+        public BubbleBuilder(float diameter)
         {
-            _viewModelDispatcher = viewModelDispatcher;
+            Diameter = diameter;
         }
 
-        public Bubble Build(BubbleType bubbleType, Vector2 position = default)
+        protected override Bubble Build(Bubble.Settings settings)
         {
-            var bubble = new Bubble(bubbleType, position, Diameter);
+            settings.Diameter = Diameter;
 
-            _viewModelDispatcher.ConstructViewModel(bubble);
-
-            return bubble;
+            return new Bubble(settings);
         }
     }
 }

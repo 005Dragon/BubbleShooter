@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Code.Common;
 using Code.Storage;
+using UnityEngine.SceneManagement;
 
 namespace Code.Services
 {
@@ -14,6 +15,6 @@ namespace Code.Services
             _sceneKeyToSceneNameIndex = sceneStorage.Scenes.ToDictionary(x => x.SceneKey, x => x.SceneName);
         }
 
-        public string GetSceneName(SceneKey sceneKey) => _sceneKeyToSceneNameIndex[sceneKey];
+        public void LoadScene(SceneKey sceneKey) => SceneManager.LoadScene(_sceneKeyToSceneNameIndex[sceneKey]);
     }
 }

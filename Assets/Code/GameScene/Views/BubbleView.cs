@@ -1,53 +1,30 @@
-using System;
 using Code.Common;
 using Code.GameScene.Models;
+using Code.Infrastructure.Models;
+using Code.Infrastructure.Views;
 using UnityEngine;
 
 namespace Code.GameScene.Views
 {
     [RequireComponent(typeof(SpriteRenderer))]
-    public class BubbleView : MonoBehaviour, IView
+    public class BubbleView : ViewBase<Bubble>
     {
-        public IModel Model { get; set; }
         public Sprite Sprite { get; set; }
         public Color Color { get; set; }
 
-        private Bubble _model;
-        
         private SpriteRenderer _spriteRenderer;
-        private Transform _cachedTransform;
-        
-        public void Initialize()
-        {
-            _model = (Bubble)Model;
 
-            _cachedTransform.position = _model.Position;
-            _cachedTransform.localScale = new Vector2(_model.Diameter, _model.Diameter);
+        public override void Initialize(IModel model)
+        {
+            base.Initialize(model);
             
             _spriteRenderer.sprite = Sprite;
             _spriteRenderer.color = Color;
-            
-            _model.PositionChanged += ModelOnPositionChanged;
-            _model.Destroyed += ModelOnDestroyed;
         }
 
         private void Awake()
         {
-            _cachedTransform = transform;
             _spriteRenderer = GetComponent<SpriteRenderer>();
-        }
-
-        private void ModelOnPositionChanged(object sender, Vector2 position)
-        {
-            _cachedTransform.position = position;
-        }
-
-        private void ModelOnDestroyed(object sender, EventArgs eventArgs)
-        {
-            _model.PositionChanged -= ModelOnPositionChanged;
-            _model.Destroyed -= ModelOnDestroyed;
-            
-            gameObject.SetActive(false);
         }
     }
 }

@@ -12,7 +12,7 @@ namespace Code.GameScene.Views.Builders
         private readonly BubbleService _bubbleService;
         private readonly Dictionary<BubbleType, List<BubbleView>> _bubbleTypeToBubbleViewsIndex = new();
 
-        public BubbleViewBuilder(Transform root, BubbleService bubbleService) : base(root)
+        public BubbleViewBuilder(BubbleService bubbleService)
         {
             _bubbleService = bubbleService;
         }
@@ -20,7 +20,8 @@ namespace Code.GameScene.Views.Builders
         protected override BubbleView CreateView(GameObject gameObject, Bubble model)
         {
             var bubbleView = base.CreateView(gameObject, model);
-            
+
+            bubbleView.name = nameof(Bubble) + model.BubbleType;
             bubbleView.Sprite = _bubbleService.GetSprite(model.BubbleType);
             bubbleView.Color = _bubbleService.GetColor(model.BubbleType);
 
@@ -38,7 +39,6 @@ namespace Code.GameScene.Views.Builders
 
                 if (view != null)
                 {
-                    view.Model = model;
                     view.gameObject.SetActive(true);
                     return true;
                 }

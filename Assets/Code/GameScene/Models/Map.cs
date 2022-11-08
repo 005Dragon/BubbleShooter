@@ -37,8 +37,10 @@ namespace Code.GameScene.Models
         private Vector2 _elementShift;
         private float _horizontalMargin;
 
-        public Map(Camera camera)
+        public Map(GameServices gameServices)
         {
+            Camera camera = gameServices.CameraService.Camera;
+            
             Vector2 minPlayZonePoint = camera.ScreenToWorldPoint(Vector3.zero);
             Vector2 maxPlayZonePoint =
                 camera.ScreenToWorldPoint(new Vector2(camera.pixelWidth, camera.pixelHeight));

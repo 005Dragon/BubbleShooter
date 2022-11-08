@@ -211,8 +211,9 @@ GameObject:
   - component: {fileID: 504265859}
   - component: {fileID: 504265858}
   - component: {fileID: 504265860}
+  - component: {fileID: 504265861}
   m_Layer: 5
-  m_Name: Panel
+  m_Name: MainMenuPanel
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -292,6 +293,20 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_AspectMode: 2
   m_AspectRatio: 0.56
+--- !u!114 &504265861
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 504265856}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7b4cd39106e843098b30521dc2549492, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _startGameButton: {fileID: 869591807}
+  _changeLevelView: {fileID: 806962889}
 --- !u!1 &537348839
 GameObject:
   m_ObjectHideFlags: 0
@@ -304,7 +319,7 @@ GameObject:
   - component: {fileID: 537348842}
   - component: {fileID: 537348841}
   m_Layer: 5
-  m_Name: NewGameText
+  m_Name: StartGameText
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -350,7 +365,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: New game
+  m_text: Start game
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -377,7 +392,7 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 46.3
+  m_fontSize: 72
   m_fontSizeBase: 24
   m_fontWeight: 400
   m_enableAutoSizing: 1
@@ -559,7 +574,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 806962884}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: da0ceb923aed4ca3b0903e9e992aad44, type: 3}
+  m_Script: {fileID: 11500000, guid: 0b7f246b305444f69e7166ec040a3636, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   _prefix: 'Mode:'
@@ -576,9 +591,8 @@ GameObject:
   - component: {fileID: 869591809}
   - component: {fileID: 869591808}
   - component: {fileID: 869591807}
-  - component: {fileID: 869591810}
   m_Layer: 5
-  m_Name: NewGameButton
+  m_Name: StartGameButton
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -687,18 +701,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 869591805}
   m_CullTransparentMesh: 1
---- !u!114 &869591810
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 869591805}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 42c954b8a18649e180959c067bcdf36c, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &1014095080
 GameObject:
   m_ObjectHideFlags: 0
@@ -913,8 +915,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 837b70fe4cf74e1fa72d4aba753d16d4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _gameConfig: {fileID: 11400000, guid: 3e1facb94bcfe9348b8f74219bbacc50, type: 2}
-  _sceneStorage: {fileID: 11400000, guid: abd561ec58c4a33468fe76f04c90f48a, type: 2}
+  _storageSet: {fileID: 11400000, guid: 4c45b958131d23b4d9976697df95c45a, type: 2}
 --- !u!4 &1312260267
 Transform:
   m_ObjectHideFlags: 0
@@ -940,7 +941,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1905596568}
   m_Layer: 5
-  m_Name: NewGameContainer
+  m_Name: StartGameContainer
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1052,7 +1053,7 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 32.35
+  m_fontSize: 72
   m_fontSizeBase: 24
   m_fontWeight: 400
   m_enableAutoSizing: 1

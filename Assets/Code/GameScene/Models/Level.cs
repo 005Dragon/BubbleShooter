@@ -1,7 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using Code.Common;
-using Code.GameScene.Models.Builders;
 using Code.GameScene.Movers;
 using Code.Services;
 using UnityEngine;
@@ -15,27 +14,26 @@ namespace Code.GameScene.Models
         public float BubbleMoveSpeed { get; set; } = 20;
         public int LevelHeight { get; set; } = 20;
         public int StageRowCount { get; set; } = 8;
-
-        private readonly LevelService _levelService;
+        
+        public BubbleExploder BubbleExploder { get; }
+        
         private readonly Map _map;
-        private readonly BubbleBuilder _bubbleBuilder;
-        private readonly BubbleMoverDispatcher _bubbleMoverDispatcher;
+        private readonly LevelService _levelService;
+        private readonly ViewModelService _viewModelService;
+        private readonly BubbleMoverService _bubbleMoverService;
 
         private Queue<BubbleType[]> _levelQueue;
 
-        public Level(
-            LevelService levelService,
-            Map map, 
-            BubbleBuilder bubbleBuilder,
-            BubbleMoverDispatcher bubbleMoverDispatcher,
-            BubbleExploder bubbleExploder)
+        public Level(Map map, GameServices gameServices)
         {
-            _levelService = levelService;
             _map = map;
-            _bubbleMoverDispatcher = bubbleMoverDispatcher;
-            _bubbleBuilder = bubbleBuilder;
             
-            bubbleExploder.ExplosionFinished += BubbleExploderOnExplosionFinished;
+            _levelService = gameServices.LevelService;
+            _viewModelService = gameServices.ViewModelService;
+            _bubbleMoverService = gameServices.BubbleMoverService;
+
+            BubbleExploder = new BubbleExploder(_map, _bubbleMoverService);
+            BubbleExploder.ExplosionFinished += BubbleExploderOnExplosionFinished;
         }
         public void Construct(LevelKey levelKey)
         {
@@ -86,8 +84,13 @@ namespace Code.GameScene.Models
                 }
                 
                 var gridPosition = new Vector2Int(x, 0);
-                
-                var bubble = _bubbleBuilder.Build(bubbleTypes[x]);
+
+                var bubble = _viewModelService.ConstructViewModel<Bubble, Bubble.Settings>(
+                    new Bubble.Settings
+                    {
+                        BubbleType = bubbleTypes[x]
+                    }
+                );
                 
                 _map.Attach(gridPosition, bubble);
             }
@@ -112,7 +115,7 @@ namespace Code.GameScene.Models
                         Vector2 targetPosition = _map.GetWorldPositionByGridPosition(targetGridPosition);
 
                         var bubbleMover = new BubbleMover(bubble, BubbleMoveSpeed, targetPosition);
-                        _bubbleMoverDispatcher.Register(bubble, bubbleMover);
+                        _bubbleMoverService.Register(bubble, bubbleMover);
                     }
                 }
             }

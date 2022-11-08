@@ -12,36 +12,39 @@ namespace Code.GameScene.Models
         public float BubbleMoveSpeed { get; set; } = 1.0f;
         public float MaxAngle { get; set; } = 70.0f;
         
-        private readonly BubbleBuilder _bubbleBuilder;
         private readonly BubbleWayBuilder _bubbleWayBuilder;
         private readonly BubbleExploder _bubbleExploder;
 
         private readonly Map _map;
-        private readonly BubbleMoverDispatcher _bubbleMoverDispatcher;
+        private readonly ViewModelService _viewModelService;
+        private readonly BubbleMoverService _bubbleMoverService;
 
         private Bubble _readyBubble;
         private bool _ready;
 
-        public BubbleShooter(
-            Map map,
-            GameUserInput gameUserInput,
-            BubbleMoverDispatcher bubbleMoverDispatcher,
-            BubbleBuilder bubbleBuilder,
-            BubbleExploder bubbleExploder)
+        public BubbleShooter(Map map, Level level, GameServices gameServices)
         {
             _map = map;
-            _bubbleMoverDispatcher = bubbleMoverDispatcher;
+            _bubbleExploder = level.BubbleExploder;
+            
+            _viewModelService = gameServices.ViewModelService;
+            _bubbleMoverService = gameServices.BubbleMoverService;
 
-            _bubbleBuilder = bubbleBuilder;
-            _bubbleWayBuilder = new BubbleWayBuilder(map, 100);
-            _bubbleExploder = bubbleExploder;
+            _bubbleWayBuilder = new BubbleWayBuilder(_map, 100);
 
-            gameUserInput.Shot += UserInputOnShot;
+            gameServices.UserInputService.Shot += UserInputOnShot;
         }
 
         public void Charge()
         {
-            _readyBubble = _bubbleBuilder.Build(BubbleService.GetRandomType(), Position);
+            _readyBubble = _viewModelService.ConstructViewModel<Bubble, Bubble.Settings>(
+                new Bubble.Settings
+                {
+                    BubbleType = BubbleService.GetRandomType(),
+                    Position = Position
+                }
+            );
+            
             _ready = true;
         }
 
@@ -62,7 +65,7 @@ namespace Code.GameScene.Models
             List<Vector2> bubbleWay = _bubbleWayBuilder.Build(Position, direction);
             
             var bubbleMover = new BubbleMover(_readyBubble, BubbleMoveSpeed, bubbleWay.ToArray());
-            _bubbleMoverDispatcher.Register(_readyBubble, bubbleMover);
+            _bubbleMoverService.Register(_readyBubble, bubbleMover);
             bubbleMover.MoveFinished += BubbleMoverOnMoveFinished;
 
             _map.Attach(_map.GetNearestFreeGridPosition(bubbleWay[^1]), _readyBubble, false);

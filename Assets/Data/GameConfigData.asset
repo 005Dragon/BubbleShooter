@@ -12,8 +12,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f463191fdc4d47c18fec5b279ddec6d4, type: 3}
   m_Name: GameConfigData
   m_EditorClassIdentifier: 
-  Level: 0
+  Level: 1
   BubbleShooterPosition: {x: 0, y: -4}
   BubbleSpeed: 20
   BubbleDiameter: 0.5
   BubbleMinYPositionToGameOver: -2
+  AimMaxIntersections: 3

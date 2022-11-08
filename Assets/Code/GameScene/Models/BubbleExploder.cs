@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Code.Common;
 using Code.GameScene.Movers;
+using Code.Services;
 using UnityEngine;
 
 namespace Code.GameScene.Models
@@ -15,12 +16,12 @@ namespace Code.GameScene.Models
         public float ExplosionForce { get; set; } = 2.0f;
         
         private readonly Map _map;
-        private readonly BubbleMoverDispatcher _bubbleMoverDispatcher;
+        private readonly BubbleMoverService _bubbleMoverService;
 
-        public BubbleExploder(Map map, BubbleMoverDispatcher bubbleMoverDispatcher)
+        public BubbleExploder(Map map, BubbleMoverService bubbleMoverService)
         {
             _map = map;
-            _bubbleMoverDispatcher = bubbleMoverDispatcher;
+            _bubbleMoverService = bubbleMoverService;
         }
 
         public bool TryExplosionGridChain(Bubble bubble)
@@ -123,7 +124,7 @@ namespace Code.GameScene.Models
         private void Explosion(Bubble bubble, Vector2 explosionCenter)
         {
             var bubbleExplosionMover = new BubbleExplosionMover(bubble, explosionCenter, ExplosionForce);
-            _bubbleMoverDispatcher.Register(bubble, bubbleExplosionMover);
+            _bubbleMoverService.Register(bubble, bubbleExplosionMover);
             bubbleExplosionMover.MoveFinished += BubbleExplosionMoverOnMoveFinished;
         }
 
